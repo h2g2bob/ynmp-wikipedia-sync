@@ -1,7 +1,9 @@
 import urllib
 import json
+import logging
 
 def latest_revision(pagename):
+	logging.debug("latest_revision(%r)", pagename)
 	req = urllib.urlopen("https://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=%s&rvprop=content&format=json" % (urllib.quote(pagename),))
 	page = req.read()
 	try:
@@ -10,12 +12,13 @@ def latest_revision(pagename):
 		revision, = page_data["revisions"]
 		return revision["*"]
 	except Exception:
-		print page
+		logging.exception("Invalid response for %r", page)
 		raise
 
 def pages_in_category(catname):
 	cmcontinue = ""
 	while True:
+		logging.debug("pages_in_category(%r) %s", catname, cmcontinue == "")
 		req = urllib.urlopen("https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:%s&format=json&cmcontinue=%s" % (urllib.quote(catname), cmcontinue,))
 		page = req.read()
 		try:
@@ -26,7 +29,7 @@ def pages_in_category(catname):
 				break
 			cmcontinue = data["query-continue"]["categorymembers"]["cmcontinue"]
 		except Exception:
-			print page
+			logging.exception("Invalid response for %r", page)
 			raise
 
 def categories_only(gen):
@@ -56,9 +59,4 @@ def parliament_constituencies():
 				if "defunct" in title.lower():
 					continue
 				yield title
-
-
-def parliament_constituencies_fromcache():
-	with open("list_of_parliament_constituencies.txt", "r") as f:
-		return f.readlines()
 
