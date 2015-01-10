@@ -1,6 +1,7 @@
 import wikipedia_api
 import wikitext_parser
 import logging
+import json
 
 def fetch_and_parse_candidates(constituency_name):
 	try:
@@ -23,8 +24,8 @@ if __name__=='__main__':
 		data[constituency_name] = candidates
 
 	with open("candidates_from_wikipedia.json", "w") as f:
-		json.dumps({
+		json.dump({
 			constituency_name : [c.to_json() for c in candidates]
 			for (constituency_name, candidates)
-			in data.items() })
+			in data.items() }, f)
 

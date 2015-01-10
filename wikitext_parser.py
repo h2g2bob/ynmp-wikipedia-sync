@@ -4,16 +4,17 @@ import logging
 
 def section_for_2015(page):
 	for section in re.findall(r"\{\{Election box begin.*?\{\{Election box end\}\}", page, re.DOTALL | re.I):
-		if "United Kingdom general election, 2015" in section:
+		if "United Kingdom general election, 2015" in section or "Next United Kingdom general election" in section or "|General Election 2015]]" in section:
 			assert section.lower().count("election box begin") == 1
 			return section
 	# does not have any 2015 section
 	return None
 
 def candidates_from_section(section):
-	candidates = re.findall(r"\{\{Election box candidate.*?\n\}\}", section, re.DOTALL | re.I)
+	candidates = re.findall(r"\{\{Election box candidate.*?\n\s*\}\}", section, re.DOTALL | re.I)
 	candidates_check = re.findall(r"candidate\s*=", section, re.DOTALL | re.I)
-	assert len(candidates_check) == len(candidates)
+	if len(candidates_check) != len(candidates):
+		raise ValueError((candidates, candidates_check))
 	return [parse_candidate_wikitext(c) for c in candidates]
 
 def remove_wikilink(name):
