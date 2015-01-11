@@ -73,7 +73,7 @@ def parse_candidate_wikitext(wikitext):
 		raise ValueError(wikitext) # party
 	party = remove_wikilink(party)
 	party = party.strip()
-	return Candidate(name, party)
+	return Candidate(name, party, person_id=name, party_id=party)
 
 def fetch_and_parse_candidates(constituency_name):
 	try:
