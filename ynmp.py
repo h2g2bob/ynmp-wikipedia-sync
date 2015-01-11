@@ -18,16 +18,25 @@ def fetch_candidates_in_constituency(constituency_id):
 	return data
 
 def candidates_in_constituency(constituency_id):
+	seen_ids = set()
 	data = fetch_candidates_in_constituency(constituency_id)
 	for person in data["result"]["memberships"]:
 		try:
 			# logging.debug("candidate: %r %r %r" % (person["person_id"]["name"], person["person_id"]["party_memberships"], person["person_id"]["standing_in"],))
-			if person["person_id"]["standing_in"].get("2015", None) is not None: # If known to not be standing, the key exists but is set to None
-				yield Candidate(
-					person_id=person["person_id"]["id"],
-					name=person["person_id"]["name"],
-					party_id=person["person_id"]["party_memberships"]["2015"]["id"],
-					party=person["person_id"]["party_memberships"]["2015"]["name"])
+			if person["person_id"]["standing_in"].get("2015", None) is None: # If known to not be standing, the key exists but is set to None
+				continue
+
+			unique_id = person["person_id"]["id"] 
+			if unique_id in seen_ids:
+				logging.info("Ignoring duplicate YNMP response %r", unique_id)
+				continue
+			seen_ids.add(unique_id)
+
+			yield Candidate(
+				person_id=person["person_id"]["id"],
+				name=person["person_id"]["name"],
+				party_id=person["person_id"]["party_memberships"]["2015"]["id"],
+				party=person["person_id"]["party_memberships"]["2015"]["name"])
 		except Exception:
 			logging.exception("Unable to parse %r", person)
 			raise
