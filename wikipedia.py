@@ -90,10 +90,13 @@ def fetch_and_parse_candidates(constituency_name):
 		page = latest_revision(constituency_name).encode("utf8")
 		section = section_for_2015(page)
 		if section is None:
+			if "2015" not in page:
+				logging.info("No section for 2015 in %r", constituency_name)
+				return []
 			raise Exception("No section on page")
 		return list(candidates_from_section(section))
 	except Exception:
-		logging.exception("Unable to parse %r" % (constituency_name,))
+		logging.exception("Unable to parse %r", constituency_name)
 		return []
 
 if __name__=='__main__':
