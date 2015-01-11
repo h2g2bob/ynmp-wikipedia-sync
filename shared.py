@@ -1,13 +1,15 @@
 
 class Candidate(object):
-	def __init__(self, name, party):
+	def __init__(self, name, party, person_id, party_id):
 		self.name = name
 		self.party = party
+		self.person_id = person_id
+		self.party_id = party_id
 	@classmethod
 	def from_dict(cls, dct):
 		return cls(**dct)
 	def to_dict(self):
-		return dict(name=self.name, party=self.party)
+		return dict(name=self.name, party=self.party, person_id=self.person_id, party_id=self.party_id)
 	def __repr__(self):
-		return "Candidate(%r, %r)" % (self.name, self.party,)
+		return "Candidate.from_dict(%r)" % (self.to_dict(),)
 

@@ -22,7 +22,7 @@ def candidates_in_constituency(constituency_id):
 	for person in data["result"]["memberships"]:
 		try:
 			# logging.debug("candidate: %r %r %r" % (person["person_id"]["name"], person["person_id"]["party_memberships"], person["person_id"]["standing_in"],))
-			if "2015" in person["person_id"]["standing_in"]:
+			if person["person_id"]["standing_in"].get("2015", None) is not None: # If known to not be standing, the key exists but is set to None
 				yield Candidate(
 					person_id=person["person_id"]["id"],
 					name=person["person_id"]["name"],
@@ -33,8 +33,10 @@ def candidates_in_constituency(constituency_id):
 			raise
 
 if __name__ == '__main__':
+	logging.root.setLevel(logging.WARN)
+
 	with open("candidates_from_ynmp.json", "w") as f:
 		json.dump({
-			"%s:%s" % (constituency_id, constituency_name,) : list(candidates_in_constituency(constituency_id))
+			"%s:%s" % (constituency_id, constituency_name,) : [c.to_dict() for c in candidates_in_constituency(constituency_id)]
 			for constituency_id, constituency_name in all_constituencies()}, f)
 
