@@ -10,6 +10,22 @@ def escape(text):
 		for c in text
 		).encode("utf8")
 
+def ynmp_url(data, canonical_name, constituency_map):
+	source_constituency_names = data.keys()
+	for source_name in source_constituency_names:
+		if canonical_name == constituency_map.lookup_or_add("ynmp", source_name, source_name):
+			return "http://yournextmp.com/constituency/%s" % (source_name.split(":")[0],)
+	logging.error("wikipedia_url(%r) did not find any matching entries in the map", canonical_name)
+	return "#"
+
+def wikipedia_url(data, canonical_name, constituency_map):
+	source_constituency_names = data.keys()
+	for source_name in source_constituency_names:
+		if canonical_name == constituency_map.lookup_or_add("wikipedia", source_name, source_name):
+			return "https://en.data.org/wiki/%s" % (source_name,)
+	logging.error("wikipedia_url(%r) did not find any matching entries in the map", canonical_name)
+	return "#"
+
 if __name__=='__main__':
 	logging.root.setLevel(logging.DEBUG)
 
@@ -28,10 +44,13 @@ if __name__=='__main__':
 		ynmponly=0
 		outfile.write("<style> th, tr { text-align: left; width: 20em; } .missing { font-weight: bold; background: #cc7777; } .constituency { background: #777777; color: #ffffff; } </style>")
 		outfile.write("<table>")
-		outfile.write("<tr><th>YNMP</th><th>Wikipeia</th></tr>")
 		for constituency_name, wp_candidates, ynmp_candidates in sorted(combined_data.merge_constituencies(constituency_map, "wikipedia", wikipedia, "ynmp", ynmp)):
 			logging.debug("compare %r", constituency_name)
 			outfile.write("<tr><th class=\"constituency\" colspan=\"2\">%s</th></tr>" % (escape(constituency_name),))
+			outfile.write("<tr>")
+			outfile.write("<th><a href=\"%s\">YNMP</a></th>" % (escape(ynmp_url(ynmp, constituency_name, constituency_map)),))
+			outfile.write("<th><a href=\"%s\">Wikipeia</a></th>" % (escape(wikipedia_url(wikipedia, constituency_name, constituency_map)),))
+			outfile.write("</tr>")
 			for candidate_name, wp_candidate, ynmp_candidate in sorted(combined_data.merge_candidates(candidate_map, constituency_name, "wikipedia", wp_candidates, "ynmp", ynmp_candidates)):
 				# logging.debug("%r %r: %r -- %r", constituency_name, candidate_name, wp_candidate, ynmp_candidate)
 				outfile.write("<tr>")
