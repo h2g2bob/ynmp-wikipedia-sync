@@ -4,9 +4,26 @@ import logging
 import re
 import json
 
+def subst_words(gen):
+	replacements = {
+		"joseph" : "joe",
+		"steven" : "steve",
+		"jeffrey" : "jeff",
+		"matthew" : "matt",
+		"christopher" : "chris",
+		"vincent" : "vince",
+		"michael" : "mike",
+		"sue" : "su",
+		"janet" : "jan",
+		"robert" : "rob",
+		"oliver" : "ollie",
+	}
+	for word in gen:
+		yield replacements.get(word, word)
+
 def similar_name(aname, bname):
-	awords = set(re.findall(r"[a-z]+", aname.lower()))
-	bwords = set(re.findall(r"[a-z]+", bname.lower()))
+	awords = set(subst_words(re.findall(r"[a-z]+", aname.lower())))
+	bwords = set(subst_words(re.findall(r"[a-z]+", bname.lower())))
 	if len(awords & bwords) >= 2:
 		return True
 	else:
