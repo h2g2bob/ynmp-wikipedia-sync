@@ -9,6 +9,8 @@ def normalise_names(constituency_map, source, data):
 		in data.items() }
 
 def merge_constituencies(constituency_map, aname, adata, bname, bdata):
+	# two datasets have different constituency names
+	# so put them through the mapper
 	adata = normalise_names(constituency_map, aname, adata)
 	bdata = normalise_names(constituency_map, bname, bdata)
 
@@ -19,11 +21,16 @@ def merge_constituencies(constituency_map, aname, adata, bname, bdata):
 	if bdata_only:
 		logging.warn("Unmapped: in %s only: %r", bname, bdata_only)
 
-	for name in set(adata.keys()) | set(bdata.keys()):
-		# print name, adata.get(name, None), bdata.get(name, None)
-		print repr(name)
+	for name in set(adata.keys()) & set(bdata.keys()):
+		yield name, adata[name], bdata[name]
+
+def compare_candidates(adata, bdata):
+	logging.debug("%r vs %r", adata, bdata)
+	# TODO
 
 if __name__=='__main__':
+	logging.root.setLevel(logging.DEBUG)
+
 	with open("candidates_from_wikipedia.json", "r") as f:
 		wikipedia = json.load(f)
 	with open("candidates_from_ynmp.json", "r") as f:
@@ -31,7 +38,9 @@ if __name__=='__main__':
 	with open("mappings_constituency.csv", "r") as f:
 		constituency_map = MappingDatabase.load(f)
 
-	merge_constituencies(constituency_map, "wikipedia", wikipedia, "ynmp", ynmp)
+	for constituency_name, wp_candidates, ynmp_candidates in merge_constituencies(constituency_map, "wikipedia", wikipedia, "ynmp", ynmp):
+		logging.debug("compare %r", constituency_name)
+		compare_candidates(wp_candidates, ynmp_candidates)
 
 	with open("mappings_constituency.csv", "w") as f:
 		constituency_map.save(f)
