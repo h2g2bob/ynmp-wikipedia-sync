@@ -1,0 +1,26 @@
+This code:
+
+* Gets a list of candidates from Wikipedia and outputs
+    candidates_from_wikipedia.json (wikipedia.py)
+* Gets a list of candidates from YourNextMP and outputs
+    candidates_from_ynmp.json (ynmp.py)
+
+* Generates a static HTML file giving a diff between the two sources
+    (generate_output_html.py)
+
+These steps happen by running scrape_again.sh
+
+It also has a database (actually a csv file) for mapping different spellings
+of the same person or constituency to a single, canonical name.
+merge.py shows how it can work for constituency names: there's no "human"
+interface for this yet.
+
+
+Drawbacks:
+
+It's not thread-safe.
+
+We should use a proper database, not dump to json files. Then we could have
+mappings be editable, and generate_output_html.py can become a lot more
+dynamic.
+
