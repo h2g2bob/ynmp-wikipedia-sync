@@ -68,7 +68,13 @@ def remove_wikilink(name):
 	return name
 
 def remove_references(name):
-	return re.sub(r"<ref.*?</ref>", "", name)
+	name = re.sub(r"<ref.*?</ref>", "", name)
+	name = re.sub(r"<ref.*?/>", "", name)
+	name = name.strip()
+	if name.startswith("[http"):
+		name = name.split(" ",1)[-1].replace("]", "", 1)
+	name = re.sub(r"\{\{citation needed.*?\}\}", "", name, flags=re.I)
+	return name
 
 def parse_candidate_wikitext(wikitext):
 	try:
