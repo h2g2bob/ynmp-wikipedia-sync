@@ -15,14 +15,14 @@ def ynmp_url(data, canonical_name, constituency_map):
 	for source_name in source_constituency_names:
 		if canonical_name == constituency_map.lookup_or_add("ynmp", source_name, source_name):
 			return "http://yournextmp.com/constituency/%s" % (source_name.split(":")[0],)
-	logging.error("wikipedia_url(%r) did not find any matching entries in the map", canonical_name)
+	logging.error("ynmp_url(%r) did not find any matching entries in the map", canonical_name)
 	return "#"
 
 def wikipedia_url(data, canonical_name, constituency_map):
 	source_constituency_names = data.keys()
 	for source_name in source_constituency_names:
 		if canonical_name == constituency_map.lookup_or_add("wikipedia", source_name, source_name):
-			return "https://en.data.org/wiki/%s" % (source_name,)
+			return "https://en.wikipedia.org/wiki/%s" % (source_name,)
 	logging.error("wikipedia_url(%r) did not find any matching entries in the map", canonical_name)
 	return "#"
 
