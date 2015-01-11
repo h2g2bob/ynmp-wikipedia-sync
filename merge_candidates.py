@@ -43,7 +43,7 @@ def find_matching_candidate(candidate, possible_matches):
 		return None
 
 if __name__=='__main__':
-	logging.root.setLevel(logging.DEBUG)
+	logging.root.setLevel(logging.WARN)
 
 	with open("candidates_from_wikipedia.json", "r") as f:
 		wikipedia = json.load(f)
@@ -63,6 +63,7 @@ if __name__=='__main__':
 				ynmp_name = constituency_name + ":" + ynmp_candidate["name"]
 				wp_name = constituency_name + ":" + wp_candidate["name"]
 				canonical_ynmp_name = candidate_map.lookup_or_add("ynmp", ynmp_name, ynmp_name)
+				canonical_wp_name = candidate_map.lookup_or_add("wikipedia", wp_name, wp_name) # assert the wikipedia name has a mapping, so we can merge it
 				logging.info("merge %r %r", wp_name, canonical_ynmp_name)
 				candidate_map.merge("wikipedia", wp_name, canonical_ynmp_name)
 
