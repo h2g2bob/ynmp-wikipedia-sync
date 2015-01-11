@@ -20,7 +20,7 @@ def latest_revision(pagename):
 		raise
 
 def parliament_constituencies():
-	page = latest_revision("List of United Kingdom Parliament constituencies")
+	page = latest_revision(u"List of United Kingdom Parliament constituencies")
 	table = re.search(r'class="wikitable sortable"(.*?)\|}\s*==', page, re.DOTALL).group(1)
 	after_tr = True
 	for line in table.split("\n")[1:]:
@@ -45,7 +45,17 @@ def section_for_2015(page):
 	return None
 
 def candidates_from_section(section):
-	candidates = re.findall(r"\{\{Election box candidate.*?\n\s*\}\}", section, re.DOTALL | re.I)
+	# Handles:
+	#    {{EBC
+	#    | candidate = 
+	#    | votes =  }}
+	# And:
+	#    {{EBC
+	#    | votes =
+	#    }}{{EBC
+	#    | votes =
+	#    }}
+	candidates = re.findall(r"\{\{Election box candidate.*?(?:\n\s*\}\}|\}\}\s*\n)", section, re.DOTALL | re.I)
 	candidates_check = re.findall(r"candidate\s*=", section, re.DOTALL | re.I)
 	if len(candidates_check) != len(candidates):
 		raise ValueError((candidates, candidates_check))
@@ -97,7 +107,7 @@ if __name__=='__main__':
 
 	with open("candidates_from_wikipedia.json", "w") as f:
 		json.dump({
-			constituency_name : [c.to_json() for c in candidates]
+			constituency_name : [c.to_dict() for c in candidates]
 			for (constituency_name, candidates)
 			in data.items() }, f)
 
