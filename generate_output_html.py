@@ -2,6 +2,13 @@ import combined_data
 import logging
 import json
 from mapping import MappingDatabase
+import re
+
+def escape(text):
+	return "".join(
+		c if c.isalnum() or c.isspace() else "&#x%04x;" % (ord(c),)
+		for c in text
+		).encode("utf8")
 
 if __name__=='__main__':
 	logging.root.setLevel(logging.DEBUG)
@@ -24,19 +31,19 @@ if __name__=='__main__':
 		outfile.write("<tr><th>YNMP</th><th>Wikipeia</th></tr>")
 		for constituency_name, wp_candidates, ynmp_candidates in sorted(combined_data.merge_constituencies(constituency_map, "wikipedia", wikipedia, "ynmp", ynmp)):
 			logging.debug("compare %r", constituency_name)
-			outfile.write("<tr><th class=\"constituency\" colspan=\"2\">%s</th></tr>" % (constituency_name.encode("utf8"),))
+			outfile.write("<tr><th class=\"constituency\" colspan=\"2\">%s</th></tr>" % (escape(constituency_name),))
 			for candidate_name, wp_candidate, ynmp_candidate in sorted(combined_data.merge_candidates(candidate_map, constituency_name, "wikipedia", wp_candidates, "ynmp", ynmp_candidates)):
 				# logging.debug("%r %r: %r -- %r", constituency_name, candidate_name, wp_candidate, ynmp_candidate)
 				outfile.write("<tr>")
 				if wp_candidate is None:
 					ynmponly += 1
-					outfile.write("<td>%s</td><td class=\"missing\">missing</td>" % (ynmp_candidate["name"].encode("utf8"),))
+					outfile.write("<td>%s</td><td class=\"missing\">missing</td>" % (escape(ynmp_candidate["name"]),))
 				elif ynmp_candidate is None:
 					wponly += 1
-					outfile.write("<td class=\"missing\">missing</td><td>%s</td>" % (wp_candidate["name"].encode("utf8"),))
+					outfile.write("<td class=\"missing\">missing</td><td>%s</td>" % (escape(wp_candidate["name"]),))
 				else:
 					both += 1
-					outfile.write("<td>%s</td><td>%s</td>" % (ynmp_candidate["name"].encode("utf8"), wp_candidate["name"].encode("utf8")))
+					outfile.write("<td>%s</td><td>%s</td>" % (escape(ynmp_candidate["name"]), escape(wp_candidate["name"]),))
 				outfile.write("</tr>\n")
 		outfile.write("</table>")
 		outfile.write("both=%d +ynmp=%d +wp=%d" % (both, ynmponly, wponly))
