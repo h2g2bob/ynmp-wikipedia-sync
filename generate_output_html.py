@@ -27,7 +27,7 @@ def wikipedia_url(data, canonical_name, constituency_map):
 	return "#"
 
 if __name__=='__main__':
-	logging.root.setLevel(logging.DEBUG)
+	logging.root.setLevel(logging.WARN)
 
 	with open("candidates_from_wikipedia.json", "r") as f:
 		wikipedia = json.load(f)
