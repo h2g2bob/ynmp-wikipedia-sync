@@ -74,7 +74,7 @@ if __name__=='__main__':
 			outfile.write("<tr><th class=\"constituency\" colspan=\"2\">%s</th><th>&nbsp;</th></tr>" % (escape(constituency_name),))
 			outfile.write("<tr>")
 			outfile.write("<th><a href=\"%s\">YNMP</a></th>" % (escape(ynmp_url(ynmp, constituency_name, constituency_map)),))
-			outfile.write("<th><a href=\"%s\">Wikipeia</a></th>" % (escape(wikipedia_url(wikipedia, constituency_name, constituency_map)),))
+			outfile.write("<th><a href=\"%s\">Wikipedia</a></th>" % (escape(wikipedia_url(wikipedia, constituency_name, constituency_map)),))
 			outfile.write("</tr>")
 			for candidate_name, wp_candidate, ynmp_candidate in sorted(combined_data.merge_candidates(candidate_map, constituency_name, "wikipedia", wp_candidates, "ynmp", ynmp_candidates)):
 				# logging.debug("%r %r: %r -- %r", constituency_name, candidate_name, wp_candidate, ynmp_candidate)
