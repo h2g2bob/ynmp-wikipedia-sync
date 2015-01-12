@@ -16,7 +16,22 @@ def subst_words(gen):
 		"sue" : "su",
 		"janet" : "jan",
 		"robert" : "rob",
+		"bob" : "rob",
 		"oliver" : "ollie",
+		"peter" : "pete",
+		"philip" : "phil",
+		"cammy" : "cameron",
+		"david" : "dave",
+		"stephen" : "steve",
+		"clifford" : "cliff",
+		"edward" : "ed",
+		"eddy" : "ed",
+		"nicholas" : "nick",
+		"chinyelu" : "chi",
+		"ernest" : "ernie",
+		"victoria" : "vicky",
+		u"andr\xe9e" : "andree",
+		"thomas" : "tom",
 	}
 	for word in gen:
 		yield replacements.get(word, word)
