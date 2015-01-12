@@ -3,6 +3,7 @@ import logging
 import json
 from mapping import MappingDatabase
 import re
+import time
 
 def escape(text):
 	return "".join(
@@ -104,6 +105,7 @@ if __name__=='__main__':
 				outfile.write("</tr>\n")
 		outfile.write("</table>")
 		outfile.write("both=%d +ynmp=%d +wp=%d" % (both, ynmponly, wponly))
+		outfile.write("<br/>Generated %s" % (time.ctime(),))
 			
 
 	with open("mappings_constituency.csv", "w") as f:
