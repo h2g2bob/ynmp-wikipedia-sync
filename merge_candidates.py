@@ -39,7 +39,8 @@ def find_matching_candidate(candidate, possible_matches):
 	elif len(matches) == 0:
 		return None
 	else:
-		logging.warn("Too many matches for %r %r", candidate, matches)
+		# Suppress this -- ynmp people will merge these later
+		logging.info("Too many matches for %r %r", candidate, matches)
 		return None
 
 if __name__=='__main__':
