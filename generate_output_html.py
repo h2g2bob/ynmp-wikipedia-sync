@@ -14,9 +14,33 @@ def ynmp_url(data, canonical_name, constituency_map):
 	source_constituency_names = data.keys()
 	for source_name in source_constituency_names:
 		if canonical_name == constituency_map.lookup_or_add("ynmp", source_name, source_name):
-			return "http://yournextmp.com/constituency/%s" % (source_name.split(":")[0],)
+			return "https://yournextmp.com/constituency/%s" % (source_name.split(":")[0],)
 	logging.error("ynmp_url(%r) did not find any matching entries in the map", canonical_name)
 	return "#"
+
+def format_party(party):
+	try:
+		short = {
+			"Plaid Cymru - The Party of Wales" : "PC",
+			"Plaid Cymru" : "PC",
+			"Green Party" : "G",
+			"Green Party of England and Wales" : "G",
+			"Liberal Democrats" : "LD",
+			"Conservative Party (UK)" : "C",
+			"Conservative Party" : "C",
+			"Labour Party" : "L",
+			"Labour Party (UK)" : "L",
+			"UK Independence Party" : "UKIP",
+			"UK Independence Party (UKIP)" : "UKIP",
+			"Independent (politician)" : "Ind",
+			"Independent" : "Ind",
+			"Scottish National Party (SNP)" : "SNP",
+			"Scottish National Party" : "SNP",
+		}[party]
+	except KeyError:
+		return ""
+	else:
+		return "<span class=\"party\">%s</span>" % (short,)
 
 def wikipedia_url(data, canonical_name, constituency_map):
 	source_constituency_names = data.keys()
@@ -42,11 +66,11 @@ if __name__=='__main__':
 		both=0
 		wponly=0
 		ynmponly=0
-		outfile.write("<style> th, tr { text-align: left; width: 20em; } .missing { font-weight: bold; background: #cc7777; } .constituency { background: #777777; color: #ffffff; } </style>")
+		outfile.write("<style> th, td { text-align: left; width: 18em; } td.links { width: 8em; } td.links a {color : #99ccff; } .missing { font-weight: bold; background: #cc7777; } .constituency { background: #777777; color: #ffffff; } span.party { font-size: 70%; color: #cccccc; } </style>")
 		outfile.write("<table>")
 		for constituency_name, wp_candidates, ynmp_candidates in sorted(combined_data.merge_constituencies(constituency_map, "wikipedia", wikipedia, "ynmp", ynmp)):
 			logging.debug("compare %r", constituency_name)
-			outfile.write("<tr><th class=\"constituency\" colspan=\"2\">%s</th></tr>" % (escape(constituency_name),))
+			outfile.write("<tr><th class=\"constituency\" colspan=\"2\">%s</th><th>&nbsp;</th></tr>" % (escape(constituency_name),))
 			outfile.write("<tr>")
 			outfile.write("<th><a href=\"%s\">YNMP</a></th>" % (escape(ynmp_url(ynmp, constituency_name, constituency_map)),))
 			outfile.write("<th><a href=\"%s\">Wikipeia</a></th>" % (escape(wikipedia_url(wikipedia, constituency_name, constituency_map)),))
@@ -56,13 +80,27 @@ if __name__=='__main__':
 				outfile.write("<tr>")
 				if wp_candidate is None:
 					ynmponly += 1
-					outfile.write("<td>%s</td><td class=\"missing\">missing</td>" % (escape(ynmp_candidate["name"]),))
 				elif ynmp_candidate is None:
 					wponly += 1
-					outfile.write("<td class=\"missing\">missing</td><td>%s</td>" % (escape(wp_candidate["name"]),))
 				else:
 					both += 1
-					outfile.write("<td>%s</td><td>%s</td>" % (escape(ynmp_candidate["name"]), escape(wp_candidate["name"]),))
+
+				if ynmp_candidate is None:
+					outfile.write("<td class=\"missing\">missing</td>")
+				else:
+					outfile.write("<td>%s %s</td>" % (escape(ynmp_candidate["name"]), format_party(ynmp_candidate["party"]),))
+
+				if wp_candidate is None:
+					outfile.write("<td class=\"missing\">missing</td>")
+				else:
+					outfile.write("<td>%s %s</td>" % (escape(wp_candidate["name"]), format_party(wp_candidate["party"]),))
+
+
+				references = (ynmp_candidate["references"] if ynmp_candidate is not None else []) + (wp_candidate["references"] if wp_candidate is not None else [])
+				outfile.write("<td class=\"links\">%s</td>" % (",".join(
+					"<a href=\"%s\">link</a>" % (escape(x),)
+					for x in references,)))
+
 				outfile.write("</tr>\n")
 		outfile.write("</table>")
 		outfile.write("both=%d +ynmp=%d +wp=%d" % (both, ynmponly, wponly))

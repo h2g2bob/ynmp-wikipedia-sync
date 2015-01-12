@@ -36,7 +36,8 @@ def candidates_in_constituency(constituency_id):
 				person_id=person["person_id"]["id"],
 				name=person["person_id"]["name"],
 				party_id=person["person_id"]["party_memberships"]["2015"]["id"],
-				party=person["person_id"]["party_memberships"]["2015"]["name"])
+				party=person["person_id"]["party_memberships"]["2015"]["name"],
+				references=[link["url"] for link in person["person_id"]["links"]])
 		except Exception:
 			logging.exception("Unable to parse %r", person)
 			raise
