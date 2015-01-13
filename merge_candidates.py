@@ -30,10 +30,13 @@ def subst_words(gen):
 		"chinyelu" : "chi",
 		"ernest" : "ernie",
 		"victoria" : "vicky",
-		u"andr\xe9e" : "andree",
+		"andr" : "andree", # u"andr\xe9e"
 		"thomas" : "tom",
 		"charles" : "charlie",
 		"anthony" : "tony",
+		"christian" : "chris",
+		"patricia" : "trish",
+		"benjamin" : "ben",
 	}
 	for word in gen:
 		yield replacements.get(word, word)
