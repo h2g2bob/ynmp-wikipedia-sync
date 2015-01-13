@@ -23,7 +23,11 @@ def candidates_in_constituency(constituency_id):
 	for person in data["result"]["memberships"]:
 		try:
 			# logging.debug("candidate: %r %r %r" % (person["person_id"]["name"], person["person_id"]["party_memberships"], person["person_id"]["standing_in"],))
-			if person["person_id"]["standing_in"].get("2015", None) is None: # If known to not be standing, the key exists but is set to None
+			standing_in_2015 = person["person_id"]["standing_in"].get("2015", None) # If known to not be standing, the key exists but is set to None
+			if standing_in_2015 is None:
+				continue
+			if standing_in_2015["name"] != data["result"]["area"]["name"]:
+				# standing elsewhere this time
 				continue
 
 			unique_id = person["person_id"]["id"] 
