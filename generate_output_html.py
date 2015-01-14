@@ -2,6 +2,7 @@ import combined_data
 import logging
 import json
 from mapping import MappingDatabase
+import party_names
 import re
 import time
 
@@ -20,25 +21,8 @@ def ynmp_url(data, canonical_name, constituency_map):
 	return "#"
 
 def format_party(party):
-	try:
-		short = {
-			"Plaid Cymru - The Party of Wales" : "PC",
-			"Plaid Cymru" : "PC",
-			"Green Party" : "G",
-			"Green Party of England and Wales" : "G",
-			"Liberal Democrats" : "LD",
-			"Conservative Party (UK)" : "C",
-			"Conservative Party" : "C",
-			"Labour Party" : "L",
-			"Labour Party (UK)" : "L",
-			"UK Independence Party" : "UKIP",
-			"UK Independence Party (UKIP)" : "UKIP",
-			"Independent (politician)" : "Ind",
-			"Independent" : "Ind",
-			"Scottish National Party (SNP)" : "SNP",
-			"Scottish National Party" : "SNP",
-		}[party]
-	except KeyError:
+	short = party_names.to_short_name(party)
+	if short is None:
 		return ""
 	else:
 		return "<span class=\"party\">%s</span>" % (short,)
