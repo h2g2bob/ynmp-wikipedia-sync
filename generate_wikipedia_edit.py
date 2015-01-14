@@ -3,6 +3,13 @@ import ynmp
 import re
 import logging
 import party_names
+import urllib
+
+def escape(text):
+	return "".join(
+		c if c.isalnum() or c.isspace() else "&#x%04x;" % (ord(c),)
+		for c in text
+		).encode("utf8")
 
 def wiki_template_for_ynmp_person(ynmp_data, ynmp_constituency_id):
 	name = ynmp_data["person_id"]["name"]
@@ -20,7 +27,6 @@ def wiki_template_for_ynmp_person(ynmp_data, ynmp_constituency_id):
 
 	ynmp_party = ynmp_data["person_id"]["party_memberships"]["2015"]["name"]
 	wikipedia_party_name = party_names.to_wikipedia_name(ynmp_party)
-	logging.debug("to_wikipedia_name(%r) = %r", ynmp_party, wikipedia_party_name)
 	if wikipedia_party_name is not None:
 		party = wikipedia_party_name
 		templatename = "Election box candidate with party link"
@@ -69,8 +75,23 @@ def generate_updated_wikitext(wikipedia_pagename, ynmp_constituency_id, ynmp_can
 	candidate_template = wiki_template_for_ynmp_person(candidate_data, ynmp_constituency_id)
 	return insert_candidate_in_election_box(wikipage, candidate_template)
 
+def generate_upload_form(form_id, wikipedia_pagename, text, summary):
+	return """
+<form id="%s" method="POST" action="https://en.wikipedia.org/w/index.php?title=%s&action=submit">
+	<input type="hidden" name="format" value="text/x-wiki" />
+	<input type="hidden" name="wpSummary" value="%s" />
+	<input type="hidden" name="wpDiff" value="Show changes" />
+	<input type="hidden" name="wpTextbox1" value="%s" />
+	<input type="submit" value="Preview changes on Wikipedia" />
+</form>""" % (form_id, escape(urllib.quote(wikipedia_pagename)), escape(summary), escape(text),)
+
 if __name__=='__main__':
 	logging.root.setLevel(logging.DEBUG)
-	print generate_updated_wikitext(u"Aberavon (UK Parliament constituency)", int(u"66101"), u"Captain Beany").encode("utf8")
+	wikipedia_pagename = u"Aberavon (UK Parliament constituency)"
+	wikitext = generate_updated_wikitext(wikipedia_pagename, int(u"66101"), u"Captain Beany")
+	print "Content-type: text/html; charset=utf8"
+	print
+	print generate_upload_form("wp_upload_form", wikipedia_pagename, wikitext, "Update list of candidates")
+	print """<script for="window" action="onload">window.setTimeout(function () { document.getElementById("wp_upload_form").submit(); }, 500);<script>"""
 
 	
