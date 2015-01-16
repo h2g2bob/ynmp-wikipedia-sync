@@ -4,6 +4,7 @@ import re
 import logging
 import party_names
 import urllib
+import datetime
 
 def escape(text):
 	return "".join(
@@ -11,19 +12,31 @@ def escape(text):
 		for c in text
 		).encode("utf8")
 
-def wiki_template_for_ynmp_person(ynmp_data, ynmp_constituency_id):
-	name = ynmp_data["person_id"]["name"]
+def fmt_today():
+	return fmt_date(datetime.date.today())
 
-	possibe_references = [
-		link["url"]
-		for link in ynmp_data["person_id"]["links"]
-		if link["note"] == "party PPC page" ]
-	if len(possibe_references) == 1:
-		reference = "[%s Party PPC page]" % (possibe_references[0],)
-	elif len(possibe_references) == 0:
-		reference = "[https://yournextmp.com/constituency/%d/ YourNextMP]" % (ynmp_constituency_id,)
-	else:
-		raise ValueError(possibe_references)
+def fmt_date(date):
+	# strftime %d pads day with a zero
+	month_name = (None, "January", "February", "March", "April", "May", "June", "July", "August", "September", "November", "December",)
+	return "%d %s %d" % (date.day, month_name[date.month], date.year,)
+
+
+def get_reference(ynmp_data, candidate_name, party):
+	for link in ynmp_data["person_id"]["links"]:
+		if link["note"] == "party PPC page":
+			return "{{cite web |url=%s |title=%s PPC page |publisher=%s |accessdate=%s }}" % (link["url"],  candidate_name, party, fmt_today(),)
+
+	for version in ynmp_data["person_id"]["versions"]:
+		m = re.search(r'(https?://[^ ]+)', version["information_source"])
+		if m is not None:
+			url = m.group(1)
+			title = re.search('(?:^|/)([^/]+)/?$', url).group(1)
+			return "{{cite web |url=%s |title=%s |accessdate=%s }}" % (url, title, fmt_today(),)
+
+	return "{{cite web |url=https://yournextmp.com/constituency/%d/ |publisher=YourNextMP |title=%s |accessdate=%s }}" % (ynmp_constituency_data["id"], ynmp_constituency_data["label"], fmt_today(),)
+
+def wiki_template_for_ynmp_person(ynmp_data, ynmp_constituency_data):
+	candidate_name = ynmp_data["person_id"]["name"]
 
 	ynmp_party = ynmp_data["person_id"]["party_memberships"]["2015"]["name"]
 	wikipedia_party_name = party_names.to_wikipedia_name(ynmp_party)
@@ -34,6 +47,8 @@ def wiki_template_for_ynmp_person(ynmp_data, ynmp_constituency_id):
 		party = ynmp_party
 		templatename = "Election box candidate"
 
+	reference = get_reference(ynmp_data, candidate_name, party)
+
 	return """{{%s
  |party = %s
  |candidate = %s<ref>%s</ref>
@@ -41,10 +56,9 @@ def wiki_template_for_ynmp_person(ynmp_data, ynmp_constituency_id):
  |percentage = 
  |change = 
 }}
-""" % (templatename, party, name, reference,)
+""" % (templatename, party, candidate_name, reference,)
 
-def fetch_ynmp_candidate_data(constituency_id, candidate_name):
-	ynmp_data = ynmp.fetch_candidates_in_constituency(constituency_id)
+def get_candidate(ynmp_data, candidate_name):
 	candidate_data_list = {
 		person["person_id"]["id"] : person # de-duplicates repetition of the same person
 		for person in ynmp_data["result"]["memberships"]
@@ -71,8 +85,9 @@ def insert_candidate_in_election_box(wikipage, extratext):
 
 def generate_updated_wikitext(wikipedia_pagename, ynmp_constituency_id, ynmp_candidate_name):
 	wikipage = wikipedia.latest_revision(wikipedia_pagename)
-	candidate_data = fetch_ynmp_candidate_data(ynmp_constituency_id, ynmp_candidate_name)
-	candidate_template = wiki_template_for_ynmp_person(candidate_data, ynmp_constituency_id)
+	ynmp_constituency_data = ynmp.fetch_candidates_in_constituency(ynmp_constituency_id)
+	candidate_data = get_candidate(ynmp_constituency_data, ynmp_candidate_name)
+	candidate_template = wiki_template_for_ynmp_person(candidate_data, ynmp_constituency_data)
 	return insert_candidate_in_election_box(wikipage, candidate_template)
 
 def generate_upload_form(form_id, wikipedia_pagename, text, summary):
