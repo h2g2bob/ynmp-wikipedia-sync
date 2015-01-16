@@ -105,7 +105,7 @@ def cgi_response(wikipedia_pagename, ynmp_constituency_id, ynmp_candidate_name):
 	return (
 		"Content-type: text/html; charset=utf8\n\n"
 		+ generate_upload_form("wp_upload_form", wikipedia_pagename, wikitext, "Update list of candidates")
-		+ """\n<script for="window" action="onload">window.setTimeout(function () { document.getElementById("wp_upload_form").submit(); }, 500);<script>""")
+		+ """\n<script for="window" action="onload">window.setTimeout(function () { document.getElementById("wp_upload_form").submit(); }, 500);</script>""")
 
 if __name__=='__main__':
 	logging.root.setLevel(logging.DEBUG)
