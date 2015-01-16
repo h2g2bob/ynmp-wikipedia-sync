@@ -100,13 +100,14 @@ def generate_upload_form(form_id, wikipedia_pagename, text, summary):
 	<input type="submit" value="Preview changes on Wikipedia" />
 </form>""" % (form_id, escape(urllib.quote(wikipedia_pagename)), escape(summary), escape(text),)
 
+def cgi_response(wikipedia_pagename, ynmp_constituency_id, ynmp_candidate_name):
+	wikitext = generate_updated_wikitext(wikipedia_pagename, int(ynmp_constituency_id), ynmp_candidate_name)
+	return (
+		"Content-type: text/html; charset=utf8\n\n"
+		+ generate_upload_form("wp_upload_form", wikipedia_pagename, wikitext, "Update list of candidates")
+		+ """\n<script for="window" action="onload">window.setTimeout(function () { document.getElementById("wp_upload_form").submit(); }, 500);<script>""")
+
 if __name__=='__main__':
 	logging.root.setLevel(logging.DEBUG)
-	wikipedia_pagename = u"Aberavon (UK Parliament constituency)"
-	wikitext = generate_updated_wikitext(wikipedia_pagename, int(u"66101"), u"Captain Beany")
-	print "Content-type: text/html; charset=utf8"
-	print
-	print generate_upload_form("wp_upload_form", wikipedia_pagename, wikitext, "Update list of candidates")
-	print """<script for="window" action="onload">window.setTimeout(function () { document.getElementById("wp_upload_form").submit(); }, 500);<script>"""
+	print cgi_response(u"Aberavon (UK Parliament constituency)", u"66101", u"Captain Beany")
 
-	
