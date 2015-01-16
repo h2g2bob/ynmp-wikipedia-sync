@@ -10,6 +10,13 @@ parties = (
 	Party("Plaid Cymru - The Party of Wales", "Plaid Cymru", "PC", []),
 	Party("Scottish National Party (SNP)", "Scottish National Party", "SNP", []),
 	Party("Independent", "Independent (politician)", "Ind", []),
+	Party("Trade Unionist and Socialist Coalition", "Trade Unionist and Socialist Coalition", "TUSC", []),
+	Party("Alliance - Alliance Party of Northern Ireland", "Alliance", "A", []),
+	Party("SDLP (Social Democratic & Labour Party)", "Social Democratic and Labour Party", "SDLP", []),
+	Party(u'Sinn F\xe9in', u'Sinn F\xe9in', "SF", []),
+	Party("Class War", None, "CW", []),
+	Party("National Health Action Party", "National Health Action Party", "NHA", []),
+	Party("Democratic Unionist Party - D.U.P.", "Democratic Unionist Party", "DUP", []),
 )
 
 lookup_long_name = {}
