@@ -101,7 +101,7 @@ def generate_upload_form(form_id, wikipedia_pagename, text, summary):
 </form>""" % (form_id, escape(urllib.quote(wikipedia_pagename)), escape(summary), escape(text),)
 
 def cgi_response(wikipedia_pagename, ynmp_constituency_id, ynmp_candidate_name):
-	wikitext = generate_updated_wikitext(wikipedia_pagename, int(ynmp_constituency_id), ynmp_candidate_name)
+	wikitext = generate_updated_wikitext(wikipedia_pagename.decode("utf8"), int(ynmp_constituency_id), ynmp_candidate_name.decode("utf8"))
 	return (
 		"Content-type: text/html; charset=utf8\n\n"
 		+ generate_upload_form("wp_upload_form", wikipedia_pagename, wikitext, "Update list of candidates")
