@@ -5,6 +5,7 @@ from mapping import MappingDatabase
 import party_names
 import re
 import time
+import urllib
 
 def escape(text):
 	return "".join(
@@ -13,12 +14,18 @@ def escape(text):
 		).encode("utf8")
 
 def ynmp_url(data, canonical_name, constituency_map):
+	yid = ynmp_id(data, canonical_name, constituency_map)
+	if yid is not None:
+		return "https://yournextmp.com/constituency/%d" % (yid,)
+	logging.error("ynmp_url(%r) did not find any matching entries in the map", canonical_name)
+	return "#"
+
+def ynmp_id(data, canonical_name, constituency_map):
 	source_constituency_names = data.keys()
 	for source_name in source_constituency_names:
 		if canonical_name == constituency_map.lookup_or_add("ynmp", source_name, source_name):
-			return "https://yournextmp.com/constituency/%s" % (source_name.split(":")[0],)
-	logging.error("ynmp_url(%r) did not find any matching entries in the map", canonical_name)
-	return "#"
+			return int(source_name.split(":")[0])
+	return None
 
 def format_party(party):
 	short = party_names.to_short_name(party)
@@ -28,12 +35,18 @@ def format_party(party):
 		return "<span class=\"party\">%s</span>" % (short,)
 
 def wikipedia_url(data, canonical_name, constituency_map):
+	source_name = wikipedia_name(data, canonical_name, constituency_map)
+	if source_name is not None:
+		return "https://en.wikipedia.org/wiki/%s" % (source_name,)
+	logging.error("wikipedia_url(%r) did not find any matching entries in the map", canonical_name)
+	return "#"
+
+def wikipedia_name(data, canonical_name, constituency_map):
 	source_constituency_names = data.keys()
 	for source_name in source_constituency_names:
 		if canonical_name == constituency_map.lookup_or_add("wikipedia", source_name, source_name):
-			return "https://en.wikipedia.org/wiki/%s" % (source_name,)
-	logging.error("wikipedia_url(%r) did not find any matching entries in the map", canonical_name)
-	return "#"
+			return source_name
+	return None
 
 if __name__=='__main__':
 	logging.root.setLevel(logging.WARN)
@@ -51,7 +64,7 @@ if __name__=='__main__':
 		both=0
 		wponly=0
 		ynmponly=0
-		outfile.write("<style> th, td { text-align: left; width: 20em; } td.links { width: 8em; } td.links a {color : #99ccff; } .missing { font-weight: bold; background: #cc7777; } .constituency { background: #777777; color: #ffffff; } span.party { font-size: 70%; color: #cccccc; } </style>")
+		outfile.write("<style> th, td { text-align: left; width: 20em; } td.links { width: 8em; } td.links a {color : #99ccff; } .missing { font-weight: bold; background: #cc7777; color: #000000; } .missing > a { color: #000000; } .constituency { background: #777777; color: #ffffff; } span.party { font-size: 70%; color: #cccccc; } </style>")
 		outfile.write("<table>")
 		for constituency_name, wp_candidates, ynmp_candidates in sorted(combined_data.merge_constituencies(constituency_map, "wikipedia", wikipedia, "ynmp", ynmp)):
 			logging.debug("compare %r", constituency_name)
@@ -76,7 +89,11 @@ if __name__=='__main__':
 					outfile.write("<td>%s %s</td>" % (escape(ynmp_candidate["name"]), format_party(ynmp_candidate["party"]),))
 
 				if wp_candidate is None:
-					outfile.write("<td class=\"missing\">missing</td>")
+					fix_url = "run/edit_wp?wppage=%s&ynmpid=%d&ynmpname=%s" % (
+						urllib.quote(wikipedia_name(wikipedia, constituency_name, constituency_map).encode("utf8")),
+						ynmp_id(ynmp, constituency_name, constituency_map),
+						urllib.quote(ynmp_candidate.get("name", "no_candidate").encode("utf8")))
+					outfile.write("<td class=\"missing\">missing (<a href=\"%s\">fix</a>)</td>" % (fix_url,))
 				else:
 					outfile.write("<td>%s %s</td>" % (escape(wp_candidate["name"]), format_party(wp_candidate["party"]),))
 
