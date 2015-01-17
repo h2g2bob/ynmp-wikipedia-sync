@@ -74,6 +74,7 @@ def remove_references(name):
 	if name.startswith("[http"):
 		name = name.split(" ",1)[-1].replace("]", "", 1)
 	name = re.sub(r"\{\{citation needed.*?\}\}", "", name, flags=re.I)
+	name = re.sub(r"\{\{#tag:.*?\}\}", "", name, flags=re.I)
 	return name
 
 def parse_candidate_wikitext(wikitext):
