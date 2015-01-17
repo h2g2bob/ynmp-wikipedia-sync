@@ -50,11 +50,11 @@ def wiki_template_for_ynmp_person(ynmp_data, ynmp_constituency_data):
 	reference = get_reference(ynmp_data, candidate_name, party)
 
 	return """{{%s
- |party = %s
- |candidate = %s<ref>%s</ref>
- |votes = 
+ |party      = %s
+ |candidate  = %s<ref>%s</ref>
+ |votes      = 
  |percentage = 
- |change = 
+ |change     = 
 }}
 """ % (templatename, party, candidate_name, reference,)
 
