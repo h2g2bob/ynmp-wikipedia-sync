@@ -55,6 +55,7 @@ def candidates_from_section(section):
 	#    }}{{EBC
 	#    | votes =
 	#    }}
+	section = re.sub(r"<!--.*?-->", "", section, flags=re.DOTALL)
 	candidates = re.findall(r"\{\{Election box candidate.*?(?:\n\s*\}\}|\}\}\s*\n)", section, re.DOTALL | re.I)
 	candidates_check = re.findall(r"candidate\s*=", section, re.DOTALL | re.I)
 	if len(candidates_check) != len(candidates):
