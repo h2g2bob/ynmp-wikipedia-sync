@@ -2,11 +2,11 @@ from collections import namedtuple
 
 Party = namedtuple("Party", "ynmp wikipedia short alternatives")
 parties = (
-	Party("Labour Party", "Labour Party (UK)", "L", []),
+	Party("Labour Party", "Labour Party (UK)", "L", ["The Labour Party"]),
 	Party("Conservative Party", "Conservative Party (UK)", "C", []),
 	Party("Liberal Democrats", "Liberal Democrats", "LD", []),
 	Party("Green Party", "Green Party of England and Wales" , "G", []),
-	Party("UK Independence Party (UKIP)", "UK Independence Party", "UKIP", []),
+	Party("UK Independence Party (UKIP)", "UK Independence Party", "UKIP", ["United Kingdom Independence Party"]),
 	Party("Plaid Cymru - The Party of Wales", "Plaid Cymru", "PC", []),
 	Party("Scottish National Party (SNP)", "Scottish National Party", "SNP", []),
 	Party("Independent", "Independent (politician)", "Ind", []),
