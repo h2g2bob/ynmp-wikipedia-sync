@@ -75,7 +75,7 @@ if __name__=='__main__':
 			new_candidate = match_el_ynmp(constituency_map, el_data, ynmp)
 			if new_candidate is not None:
 				el_constituency_name, _, el_party = new_candidate
-				print "<a href=\"%s\">%s %s</a> (ynmp <br/>" % (url, escape(el_constituency_name), escape(el_party),)
+				print "<a href=\"%s\">%s %s</a><br/>" % (url, escape(el_constituency_name), escape(el_party),)
 		except Exception:
 			logging.info("Cannot parse leaflet page %r", url, exc_info=sys.exc_info())
 	print "(generated %r)" % (time.ctime(),)
