@@ -1,4 +1,10 @@
 
+def escape_html(text):
+	return "".join(
+		c if c.isalnum() or c.isspace() else "&#x%04x;" % (ord(c),)
+		for c in text
+		).encode("utf8")
+
 class Candidate(object):
 	def __init__(self, name, party, person_id, party_id, references):
 		self.name = name

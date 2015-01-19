@@ -6,12 +6,7 @@ import party_names
 import re
 import time
 import urllib
-
-def escape(text):
-	return "".join(
-		c if c.isalnum() or c.isspace() else "&#x%04x;" % (ord(c),)
-		for c in text
-		).encode("utf8")
+from shared import escape_html as escape
 
 def ynmp_url(data, canonical_name, constituency_map):
 	yid = ynmp_id(data, canonical_name, constituency_map)

@@ -5,12 +5,7 @@ import logging
 import party_names
 import urllib
 import datetime
-
-def escape(text):
-	return "".join(
-		c if c.isalnum() or c.isspace() else "&#x%04x;" % (ord(c),)
-		for c in text
-		).encode("utf8")
+from shared import escape_html as escape
 
 def fmt_today():
 	return fmt_date(datetime.date.today())
