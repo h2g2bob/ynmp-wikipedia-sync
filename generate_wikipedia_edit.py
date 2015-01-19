@@ -71,7 +71,7 @@ def insert_candidate_in_election_box(wikipage, extratext):
 		raise Exception("No 2015 section on the page")
 	head, tail = wikipage.split(section, 1)
 
-	m = re.search(r"(\{\{Election box end.*)$", section, flags=re.I | re.DOTALL)
+	m = re.search(r"(\{\{Election box (?:end|majority|turnout).*)$", section, flags=re.I | re.DOTALL)
 	if m is None:
 		raise Exception("Could not find end tag on wikipage")
 	section = section.replace(m.group(1), extratext + m.group(1))
