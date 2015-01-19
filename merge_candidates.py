@@ -27,6 +27,7 @@ def subst_words(gen):
 		"edward" : "ed",
 		"eddy" : "ed",
 		"nicholas" : "nick",
+		"nic" : "nick",
 		"chinyelu" : "chi",
 		"ernest" : "ernie",
 		"victoria" : "vicky",
@@ -37,6 +38,7 @@ def subst_words(gen):
 		"christian" : "chris",
 		"patricia" : "trish",
 		"benjamin" : "ben",
+		"terence" : "terry",
 	}
 	for word in gen:
 		yield replacements.get(word, word)
