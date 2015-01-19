@@ -22,12 +22,11 @@ def ynmp_id(data, canonical_name, constituency_map):
 			return int(source_name.split(":")[0])
 	return None
 
-def format_party(party):
-	short = party_names.to_short_name(party)
+def format_party(short):
 	if short is None:
 		return ""
 	else:
-		return "<span class=\"party\">%s</span>" % (short,)
+		return "<span class=\"party\">%s</span>" % (escape(short),)
 
 def wikipedia_url(data, canonical_name, constituency_map):
 	source_name = wikipedia_name(data, canonical_name, constituency_map)
@@ -62,6 +61,7 @@ if __name__=='__main__':
 		outfile.write("<style> th, td { text-align: left; width: 20em; } td.links { width: 8em; } td.links a {color : #99ccff; } .missing { font-weight: bold; background: #cc7777; color: #000000; } .missing > a { color: #000000; } .constituency { background: #777777; color: #ffffff; } span.party { font-size: 70%; color: #cccccc; } </style>")
 		outfile.write("<table>")
 		for constituency_name, wp_candidates, ynmp_candidates in sorted(combined_data.merge_constituencies(constituency_map, "wikipedia", wikipedia, "ynmp", ynmp)):
+			seen_parties = set()
 			logging.debug("compare %r", constituency_name)
 			outfile.write("<tr><th class=\"constituency\" colspan=\"2\">%s</th><th>&nbsp;</th></tr>" % (escape(constituency_name),))
 			outfile.write("<tr>")
@@ -70,6 +70,8 @@ if __name__=='__main__':
 			outfile.write("</tr>")
 			for candidate_name, wp_candidate, ynmp_candidate in sorted(combined_data.merge_candidates(candidate_map, constituency_name, "wikipedia", wp_candidates, "ynmp", ynmp_candidates)):
 				# logging.debug("%r %r: %r -- %r", constituency_name, candidate_name, wp_candidate, ynmp_candidate)
+				warnings = []
+
 				outfile.write("<tr>")
 				if wp_candidate is None:
 					ynmponly += 1
@@ -78,10 +80,21 @@ if __name__=='__main__':
 				else:
 					both += 1
 
+				ynmp_party = party_names.to_short_name(ynmp_candidate["party"]) if ynmp_candidate is not None else None
+				wp_party = party_names.to_short_name(wp_candidate["party"]) if wp_candidate is not None else None
+				if ynmp_party and wp_party and ynmp_party != wp_party:
+					warnings.append("Parties do not match")
+				if ynmp_party in seen_parties or wp_party in seen_parties:
+					warnings.append("More than one candidate for this party")
+				if ynmp_party:
+					seen_parties.add(ynmp_party)
+				if wp_party:
+					seen_parties.add(wp_party)
+
 				if ynmp_candidate is None:
 					outfile.write("<td class=\"missing\">missing</td>")
 				else:
-					outfile.write("<td>%s %s</td>" % (escape(ynmp_candidate["name"]), format_party(ynmp_candidate["party"]),))
+					outfile.write("<td>%s %s</td>" % (escape(ynmp_candidate["name"]), format_party(ynmp_party),))
 
 				if wp_candidate is None:
 					fix_url = "run/edit_wp?wppage=%s&ynmpid=%d&ynmpname=%s" % (
@@ -90,13 +103,15 @@ if __name__=='__main__':
 						urllib.quote(ynmp_candidate.get("name", "no_candidate").encode("utf8")))
 					outfile.write("<td class=\"missing\">missing (<a href=\"%s\">fix</a>)</td>" % (fix_url,))
 				else:
-					outfile.write("<td>%s %s</td>" % (escape(wp_candidate["name"]), format_party(wp_candidate["party"]),))
+					outfile.write("<td>%s %s</td>" % (escape(wp_candidate["name"]), format_party(wp_party),))
 
 
 				references = (ynmp_candidate["references"] if ynmp_candidate is not None else []) + (wp_candidate["references"] if wp_candidate is not None else [])
-				outfile.write("<td class=\"links\">%s</td>" % (",".join(
+
+				outfile.write("<td class=\"links\">%s %s</td>" % (",".join(
 					"<a href=\"%s\">link</a>" % (escape(x),)
-					for x in references,)))
+					for x in references,),
+					" ".join(warnings),))
 
 				outfile.write("</tr>\n")
 		outfile.write("</table>")
