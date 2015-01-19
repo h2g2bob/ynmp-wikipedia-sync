@@ -85,7 +85,9 @@ if __name__=='__main__':
 				if ynmp_party and wp_party and ynmp_party != wp_party:
 					warnings.append("Parties do not match")
 				if ynmp_party in seen_parties or wp_party in seen_parties:
-					warnings.append("More than one candidate for this party")
+					bad_party = ynmp_party or wp_party
+					if bad_party != "Ind": # allowed to have more than one independent
+						warnings.append("More than one candidate for this party")
 				if ynmp_party:
 					seen_parties.add(ynmp_party)
 				if wp_party:
