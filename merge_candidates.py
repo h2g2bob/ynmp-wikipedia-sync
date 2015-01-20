@@ -13,6 +13,7 @@ def subst_words(gen):
 		"christopher" : "chris",
 		"vincent" : "vince",
 		"michael" : "mike",
+		"mick" : "mike",
 		"sue" : "su",
 		"janet" : "jan",
 		"robert" : "rob",
@@ -40,6 +41,8 @@ def subst_words(gen):
 		"benjamin" : "ben",
 		"terence" : "terry",
 		"ibrahim" : "ibby",
+		"rebecca" : "beci",
+		"gareth" : "gaz",
 	}
 	for word in gen:
 		yield replacements.get(word, word)
