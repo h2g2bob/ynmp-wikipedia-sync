@@ -47,6 +47,7 @@ def subst_words(gen):
 		"gregory" : "greg",
 		"andrew" : "andy",
 		"kenneth" : "ken",
+		"martin" : "martie",
 	}
 	for word in gen:
 		yield replacements.get(word, word)
