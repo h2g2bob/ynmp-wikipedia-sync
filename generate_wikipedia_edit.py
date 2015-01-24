@@ -28,7 +28,7 @@ def get_reference(ynmp_data, candidate_name, party, ynmp_constituency_data):
 			title = re.search('(?:^|/)([^/]+)/?$', url).group(1)
 			return "{{cite web |url=%s |title=%s |accessdate=%s }}" % (url, title, fmt_today(),)
 
-	return "{{cite web |url=https://yournextmp.com/constituency/%d/ |publisher=YourNextMP |title=%s |accessdate=%s }}" % (ynmp_constituency_data["result"]["id"], ynmp_constituency_data["result"]["label"], fmt_today(),)
+	return "{{cite web |url=https://yournextmp.com/constituency/%d/ |publisher=YourNextMP |title=%s |accessdate=%s }}" % (int(ynmp_constituency_data["result"]["id"]), ynmp_constituency_data["result"]["label"], fmt_today(),)
 
 def wiki_template_for_ynmp_person(ynmp_data, ynmp_constituency_data):
 	candidate_name = ynmp_data["person_id"]["name"]
@@ -105,4 +105,3 @@ def cgi_response(wikipedia_pagename, ynmp_constituency_id, ynmp_candidate_name):
 if __name__=='__main__':
 	logging.root.setLevel(logging.DEBUG)
 	print cgi_response(u"Aberavon (UK Parliament constituency)", u"66101", u"Captain Beany")
-
