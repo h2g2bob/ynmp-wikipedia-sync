@@ -16,7 +16,7 @@ def fmt_date(date):
 	return "%d %s %d" % (date.day, month_name[date.month], date.year,)
 
 
-def get_reference(ynmp_data, candidate_name, party):
+def get_reference(ynmp_data, candidate_name, party, ynmp_constituency_data):
 	for link in ynmp_data["person_id"]["links"]:
 		if link["note"] == "party PPC page":
 			return "{{cite web |url=%s |title=%s PPC page |publisher=%s |accessdate=%s }}" % (link["url"],  candidate_name, party, fmt_today(),)
@@ -42,7 +42,7 @@ def wiki_template_for_ynmp_person(ynmp_data, ynmp_constituency_data):
 		party = ynmp_party
 		templatename = "Election box candidate"
 
-	reference = get_reference(ynmp_data, candidate_name, party)
+	reference = get_reference(ynmp_data, candidate_name, party, ynmp_constituency_data)
 
 	return """{{%s
  |party      = %s
