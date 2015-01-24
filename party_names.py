@@ -4,9 +4,9 @@ Party = namedtuple("Party", "ynmp wikipedia short alternatives")
 parties = (
 	Party("Labour Party", "Labour Party (UK)", "L", ["The Labour Party"]),
 	Party("Conservative Party", "Conservative Party (UK)", "C", []),
-	Party("Liberal Democrats", "Liberal Democrats", "LD", ["Liberal Democrats (UK)"]),
-	Party("Green Party", "Green Party of England and Wales" , "G", ["Green Party (UK)"]),
-	Party("UK Independence Party (UKIP)", "UK Independence Party", "UKIP", ["United Kingdom Independence Party"]),
+	Party("Liberal Democrats", "Liberal Democrats", "LD", ["Liberal Democrats (UK)", "Scottish Liberal Democrats"]),
+	Party("Green Party", "Green Party of England and Wales" , "G", ["Green Party (UK)", "Scottish Green Party"]),
+	Party("UK Independence Party (UKIP)", "UK Independence Party", "UKIP", ["United Kingdom Independence Party", "UKIP"]),
 	Party("Plaid Cymru - The Party of Wales", "Plaid Cymru", "PC", []),
 	Party("Scottish National Party (SNP)", "Scottish National Party", "SNP", []),
 	Party("Independent", "Independent (politician)", "Ind", []),
