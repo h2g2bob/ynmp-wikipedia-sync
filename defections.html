@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html><head>
+<title>YourNextMP statistics</title>
+<script type="application/javascript" src="https://www.google.com/jsapi"></script>
+<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="application/javascript">
+function fetch_data() {
+	$.getJSON("ynmp_stats.json", display_data);
+}
+
+function display_data(data) {
+	display_defections(data["candidate_changed_party"]);
+}
+
+function display_defections(defections) {
+	var parties_from = [];
+	var parties_to = []
+	var data_order = {};
+	$.each(defections, function (key, value) {
+		var args = key.split(" to ");
+		if (parties_from.indexOf(args[0]) == -1) {
+			parties_from.push(args[0]);
+		}
+		if (parties_to.indexOf(args[1]) == -1) {
+			parties_to.push(args[1]);
+		}
+		data_order[args[0]] = (data_order[args[0]] || 0) + value;
+		data_order[args[1]] = (data_order[args[1]] || 0) + value;
+	});
+	parties_from.sort(function (a, b) { return data_order[a] < data_order[b]; });
+	parties_to.sort(function (a, b) { return data_order[a] < data_order[b]; });
+
+	var table = new google.visualization.DataTable();
+	table.addColumn('string', 'Defections');
+	$.each(parties_to, function (idx_to, name_to) {
+		table.addColumn('number', "To " + name_to);
+	});
+	table.addRows(parties_from.length);
+	$.each(parties_from, function (idx_from, name_from) {
+		table.setCell(idx_from, 0, "From " + name_from);
+		$.each(parties_to, function (idx_to, name_to) {
+			var count = defections[name_from + " to " + name_to];
+			table.setCell(idx_from, idx_to+1, count);
+		});
+	});
+	var options = {
+		width: 600,
+		height: 400,
+		legend: { position: 'top', maxLines: 3 },
+		bar: { groupWidth: '75%' },
+		isStacked: true,
+		colors: ["#ff0000", "#ccccff", "#ffcccc"]
+	};
+
+	var view = new google.visualization.Table(document.getElementById('defections'));
+	view.draw(table);
+}
+
+
+google.load("visualization", "1", {packages:["corechart", "table"]});
+google.setOnLoadCallback(fetch_data);
+
+</script>
+</head><body>
+<h1>Defections</h1>
+<em>Candidates who changed party</em>
+<div id="defections"></div>
+</body></html>
