@@ -117,6 +117,8 @@ def parse_constituency_data(data):
 		stats["party_2015_only"][party] += 1
 	for party in parties_2010 & parties_2015:
 		stats["party_2010_and_2015"][party] += 1
+	for party in parties_2015:
+		stats["party_2015"][party] += 1
 		
 	return stats
 
