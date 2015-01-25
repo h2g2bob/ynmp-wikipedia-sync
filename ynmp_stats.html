@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html><head>
+<script type="application/javascript" src="https://www.google.com/jsapi"></script>
+<script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script type="application/javascript">
+function fetch_data() {
+	$.getJSON("ynmp_stats.json", display_data);
+}
+
+function list_of_parties(data) {
+	var parties = [];
+	$.each(data["party_2015"], function (key, value) {
+		if (value >= 5) { // exclude small parties
+			parties.push(key);
+		}
+	});
+	parties.sort(function (a, b) {
+		return data["party_2015"][a] < data["party_2015"][b];
+	});
+	return parties;
+}
+
+function display_data(data) {
+	var parties = list_of_parties(data);
+	display_work_needed(parties, data);
+	display_gender(parties, data);
+	display_bool(parties, data, "same_candidate_same_constituency", "#444444", "Same candidate", "#cccccc", "Different candidate");
+	display_bool(parties, data, "has_twitter", "#77ccff", "has twitter", "#cccccc", "no twitter");
+	display_bool(parties, data, "has_facebook", "#cc77ff", "has facebook", "#cccccc", "no facebook");
+	display_bool(parties, data, "has_homepage", "#ccff77", "has website", "#cccccc", "no website");
+}
+
+function display_work_needed(parties, data) {
+	var table = new google.visualization.DataTable();
+	table.addColumn('string', 'Party name');
+	table.addColumn('number', '2010 only');
+	table.addColumn('number', '2010 and 2015');
+	table.addColumn('number', '2015 only');
+	$.each(parties, function (idx, party) {
+		table.addRows([
+			[party, data["party_2010_only"][party], data["party_2010_and_2015"][party], data["party_2015_only"][party]]
+		]);
+	});
+	var options = {
+		width: 600,
+		height: 400,
+		legend: { position: 'top', maxLines: 3 },
+		bar: { groupWidth: '75%' },
+		isStacked: true,
+		colors: ["#ff0000", "#ccccff", "#ffcccc"]
+	};
+        var chart = new google.visualization.BarChart(document.getElementById('work_needed'));
+        chart.draw(table, options);
+}
+
+function display_bool(parties, data, key, yes_color, yes_label, no_color, no_label) {
+	var table = new google.visualization.DataTable();
+	table.addColumn('string', 'Party name');
+	table.addColumn('number', yes_label);
+	table.addColumn('number', no_label);
+	$.each(parties, function (idx, party) {
+		var same = data[key][party] || 0;
+		table.addRows([
+			[party, same, data["party_2015"][party] - same]
+		]);
+	});
+	var options = {
+		width: 600,
+		height: 400,
+		legend: { position: 'top', maxLines: 3 },
+		bar: { groupWidth: '75%' },
+		isStacked: true,
+		colors: [yes_color, no_color]
+	};
+        var chart = new google.visualization.BarChart(document.getElementById(key));
+        chart.draw(table, options);
+}
+
+function display_gender(parties, data) {
+	var table = new google.visualization.DataTable();
+	table.addColumn('string', 'Party name');
+	table.addColumn('number', 'Female');
+	table.addColumn('number', 'Male');
+	table.addColumn('number', 'Not set');
+	$.each(parties, function (idx, party) {
+		table.addRows([
+			[party, data["gender_female"][party], data["gender_male"][party], data["gender_undefined"][party]]
+		]);
+	});
+	var options = {
+		width: 600,
+		height: 400,
+		legend: { position: 'top', maxLines: 3 },
+		bar: { groupWidth: '75%' },
+		isStacked: true,
+		colors: ["#cc4444", "#4444cc", "#cccccc"]
+	};
+        var chart = new google.visualization.BarChart(document.getElementById('gender'));
+        chart.draw(table, options);
+}
+
+google.load("visualization", "1", {packages:["corechart"]});
+google.setOnLoadCallback(fetch_data);
+</script>
+</head><body>
+<h1>YourNextMP stats</h1>
+
+<h2>Candidates</h2>
+<em>Number of constituencies containing candidates from each party</em>
+<div id="work_needed"></div>
+
+<h2>Fielding the same candidate?</h2>
+<em>Number of constituencies fielding the same candidate in 2010 and 2015</em>
+<div id="same_candidate_same_constituency"></div>
+
+<h2>Gender</h2>
+<em>Gender of candidates standing in 2015</em>
+<div id="gender"></div>
+
+<h2>Candidates on twitter</h2>
+<em>Number of candidates standing in 2015 with twitter contact details</em>
+<div id="has_twitter"></div>
+
+<h2>Candidates on facebook</h2>
+<em>Number of candidates standing in 2015 with at least one facebook page</em>
+<div id="has_facebook"></div>
+
+<h2>Candidates with a website</h2>
+<em>Number of candidates standing in 2015 with a homepage set</em>
+<div id="has_homepage"></div>
+
+</body></html>
