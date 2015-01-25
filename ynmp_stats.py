@@ -129,7 +129,7 @@ def gather_stats():
 
 if __name__=='__main__':
 	import json
-	logging.root.setLevel(logging.DEBUG)
+	logging.root.setLevel(logging.WARN)
 	stats = gather_stats()
 	print json.dumps({k : dict(v.items()) for k, v in stats.items()}, indent=True)
 
