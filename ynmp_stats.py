@@ -152,7 +152,7 @@ def gather_stats():
 def atomic_write(directory, filename, text):
 	full_dest_filename = os.path.join(directory, filename)
 	temp_name = os.path.join(directory, ".tmp" + filename) # not using tempfile because the target directory is chmod ug+s
-	with open("temp_name", "w") as temp_f:
+	with open(temp_name, "w") as temp_f:
 		temp_f.write(text)
 	os.rename(temp_name, full_dest_filename) # atomic
 
