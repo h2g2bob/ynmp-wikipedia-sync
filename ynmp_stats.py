@@ -1,11 +1,11 @@
 import ynmp
-import mapit
 import logging
 from collections import defaultdict
 import re
 import os.path
 import os
 import json
+import tempfile
 
 """
 done	party_2010_only[party]
@@ -134,13 +134,17 @@ def escape_eu_name(eu_name):
 def gather_stats():
 	stats = defaultdict(lambda: defaultdict(int))
 	stats_by_eu_region = defaultdict(lambda : defaultdict(lambda: defaultdict(int)))
+
+	with open("constituency_id_to_eu_name.json", "r") as f:
+		constituency_id_to_eu_name = json.load(f)
+
 	for constituency_id, constituency_name in tuple(ynmp.all_constituencies()):
 		constituency_data = ynmp.fetch_candidates_in_constituency(constituency_id)
 		constituency_stats = parse_constituency_data(constituency_data)
 
 		merge_counters(stats, constituency_stats)
 
-		eu_region_name = escape_eu_name(mapit.eu_region_from_url(constituency_data["result"]["area"]["identifier"]))
+		eu_region_name = escape_eu_name(constituency_id_to_eu_name[str(constituency_id)])
 		merge_counters(stats_by_eu_region[eu_region_name], constituency_stats)
 
 	return stats, stats_by_eu_region
@@ -148,7 +152,8 @@ def gather_stats():
 def atomic_write(directory, filename, text):
 	full_dest_filename = os.path.join(directory, filename)
 
-	temp_f, temp_name = tempfile.mkstemp(prefix=".tmp", suffix=".json", dir=directory)
+	temp_fd, temp_name = tempfile.mkstemp(prefix=".tmp", suffix=".json", dir=directory)
+	temp_f = os.fdopen(temp_fd, "w")
 	temp_f.write(text)
 	temp_f.close()
 	os.rename(temp_name, full_dest_filename) # atomic
@@ -166,7 +171,7 @@ if __name__=='__main__':
 
 	stats, eu_stats = gather_stats()
 
-	atomic_write("ynmp_stats.json", format_stats(stats))
+	atomic_write(args.directory, "ynmp_stats.json", format_stats(stats))
 	for eu_name, eu_data in eu_stats.items():
 		atomic_write(args.directory, "ynmp_stats_%s.json" % (eu_name,), format_stats(eu_data))
 
