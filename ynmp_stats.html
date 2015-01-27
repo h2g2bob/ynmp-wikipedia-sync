@@ -5,7 +5,9 @@
 <script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script type="application/javascript">
 function fetch_data() {
-	$.getJSON("ynmp_stats.json", display_data);
+	var eu_region_m = RegExp("^\\?([a-z0-9A-Z]+)$").exec(window.location.search)
+	$.getJSON("ynmp_stats" + (eu_region_m ? "_" + eu_region_m[1] : "") + ".json", display_data);
+	$.getJSON("ynmp_stats_index.json", display_index);
 }
 
 function list_of_parties(data) {
@@ -19,6 +21,18 @@ function list_of_parties(data) {
 		return data["party_2015"][a] < data["party_2015"][b];
 	});
 	return parties;
+}
+
+function display_index(data) {
+	var area_selector = $("#area_selector");
+	var make_child = function (link, text) {
+		return $("<a/>").attr("href", "?" + link).text(text);
+	};
+	area_selector.append(make_child("", "all"));
+	$.each(data, function (idx, eu_name) {
+		area_selector.append(" &middot; ");
+		area_selector.append(make_child(eu_name, eu_name));
+	});
 }
 
 function display_data(data) {
@@ -139,6 +153,8 @@ google.setOnLoadCallback(fetch_data);
 <em>Number of candidates standing in 2015 with a website</em>
 <p>Candidates with a homepage set</p>
 <div id="has_homepage"></div>
+
+<div id="area_selector"></div>
 
 <p>(<a href="ynmp_stats.json">data</a> - <a href="https://github.com/h2g2bob/ynmp-wikipedia-sync/blob/master/ynmp_stats.py">code</a>)</p>
 </body></html>

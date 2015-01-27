@@ -1,6 +1,11 @@
 import ynmp
+import mapit
 import logging
 from collections import defaultdict
+import re
+import os.path
+import os
+import json
 
 """
 done	party_2010_only[party]
@@ -23,6 +28,7 @@ done	gender_female[party]
 done	gender_undefined[party]
 done	gender_other[party]
 """
+
 
 
 def merge_counters(stats, moredata):
@@ -122,16 +128,48 @@ def parse_constituency_data(data):
 		
 	return stats
 
+def escape_eu_name(eu_name):
+	return re.sub(r"[^a-z0-9A-Z]", "", eu_name).lower()
+
 def gather_stats():
 	stats = defaultdict(lambda: defaultdict(int))
+	stats_by_eu_region = defaultdict(lambda : defaultdict(lambda: defaultdict(int)))
 	for constituency_id, constituency_name in tuple(ynmp.all_constituencies()):
 		constituency_data = ynmp.fetch_candidates_in_constituency(constituency_id)
-		merge_counters(stats, parse_constituency_data(constituency_data))
-	return stats
+		constituency_stats = parse_constituency_data(constituency_data)
+
+		merge_counters(stats, constituency_stats)
+
+		eu_region_name = escape_eu_name(mapit.eu_region_from_url(constituency_data["result"]["area"]["identifier"]))
+		merge_counters(stats_by_eu_region[eu_region_name], constituency_stats)
+
+	return stats, stats_by_eu_region
+
+def atomic_write(directory, filename, text):
+	full_dest_filename = os.path.join(directory, filename)
+
+	temp_f, temp_name = tempfile.mkstemp(prefix=".tmp", suffix=".json", dir=directory)
+	temp_f.write(text)
+	temp_f.close()
+	os.rename(temp_name, full_dest_filename) # atomic
+
+def format_stats(stats):
+	return json.dumps({k : dict(v.items()) for k, v in stats.items()}, indent=True)
 
 if __name__=='__main__':
-	import json
+	import argparse
 	logging.root.setLevel(logging.WARN)
-	stats = gather_stats()
-	print json.dumps({k : dict(v.items()) for k, v in stats.items()}, indent=True)
+
+	parser = argparse.ArgumentParser()
+	parser.add_argument("--directory", metavar="DIR", type=str, help="directory for datafiles", required=True)
+	args = parser.parse_args()
+
+	stats, eu_stats = gather_stats()
+
+	atomic_write("ynmp_stats.json", format_stats(stats))
+	for eu_name, eu_data in eu_stats.items():
+		atomic_write(args.directory, "ynmp_stats_%s.json" % (eu_name,), format_stats(eu_data))
+
+	atomic_write(args.directory, "ynmp_stats_index.json", json.dumps(list(eu_stats.keys())))
+
 
