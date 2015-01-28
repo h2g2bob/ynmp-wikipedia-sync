@@ -4,8 +4,13 @@
 <script type="application/javascript" src="https://www.google.com/jsapi"></script>
 <script type="application/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script type="application/javascript">
+var g_party_display_threshold = 5;
+
 function fetch_data() {
 	var eu_region_m = RegExp("^\\?([a-z0-9A-Z]+)$").exec(window.location.search)
+	if (eu_region_m) {
+		g_party_display_threshold = 0;
+	}
 	$.getJSON("ynmp_stats" + (eu_region_m ? "_" + eu_region_m[1] : "") + ".json", display_data);
 	$.getJSON("ynmp_stats_index.json", display_index);
 }
@@ -13,7 +18,7 @@ function fetch_data() {
 function list_of_parties(data) {
 	var parties = [];
 	$.each(data["party_2015"], function (key, value) {
-		if (value >= 5) { // exclude small parties
+		if (value >= g_party_display_threshold) { // exclude small parties
 			parties.push(key);
 		}
 	});
