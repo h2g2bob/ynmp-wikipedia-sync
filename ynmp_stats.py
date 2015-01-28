@@ -36,6 +36,24 @@ def merge_counters(stats, moredata):
 		for party, counter in statvalues.items():
 			stats[statname][party] += counter
 
+def extract_party_name(person, year):
+	memberships = person["party_memberships"]
+	if memberships is None:
+		return None
+	m_year = memberships.get(year)
+	if m_year is None:
+		return None
+	return m_year["name"]
+
+def extract_post_id(person, year):
+	standings = person["standing_in"]
+	if standings is None:
+		return None
+	s_year = standings.get(year)
+	if s_year is None:
+		return None
+	return s_year["post_id"]
+
 def parse_constituency_data(data):
 	stats = defaultdict(lambda: defaultdict(int))
 	post_id = data["result"]["id"]
@@ -51,10 +69,10 @@ def parse_constituency_data(data):
 			else:
 				people_seen_this_constuency.add(person["id"])
 
-			party_2015 = (person["party_memberships"].get("2015") or {"name": None})["name"]
-			party_2010 = (person["party_memberships"].get("2010") or {"name": None})["name"]
-			standing_2015 = (person["standing_in"].get("2015") or {"post_id": None})["post_id"]
-			standing_2010 = (person["standing_in"].get("2010") or {"post_id": None})["post_id"]
+			party_2015 = extract_party_name(person, "2015")
+			party_2010 = extract_party_name(person, "2010")
+			standing_2015 = extract_post_id(person, "2015")
+			standing_2010 = extract_post_id(person, "2010")
 			standing_here_2015 = standing_2015 == post_id
 			standing_here_2010 = standing_2010 == post_id
 
@@ -82,6 +100,7 @@ def parse_constituency_data(data):
 					stats["has_email"][party_2015] += 1
 
 				if person.get("gender") == None:
+					logging.info("Gender not set https://yournextmp.com/person/%d/ %s", int(person.get("id")), person.get("name"))
 					stats["gender_undefined"][party_2015] += 1
 				elif person.get("gender").lower() == "male":
 					stats["gender_male"][party_2015] += 1
@@ -161,11 +180,16 @@ def format_stats(stats):
 
 if __name__=='__main__':
 	import argparse
-	logging.root.setLevel(logging.WARN)
 
 	parser = argparse.ArgumentParser()
-	parser.add_argument("--directory", metavar="DIR", type=str, help="directory for datafiles", required=True)
+	parser.add_argument("--directory", "-d", metavar="DIR", type=str, help="directory for datafiles", required=True)
+	parser.add_argument("--verbose", "-v", action="count", help="More logging (can use multiple times)", required=True)
 	args = parser.parse_args()
+
+	logging.root.setLevel({
+		0 : logging.WARN,
+		1 : logging.INFO,
+		}.get(args.verbose, logging.DEBUG))
 
 	stats, eu_stats = gather_stats()
 
