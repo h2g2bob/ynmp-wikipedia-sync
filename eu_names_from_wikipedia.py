@@ -17,7 +17,7 @@ def ynmp_spelling(constituency_map, wp_constituency_name):
 		raise ValueError("ynmp_spelling(%s) -> %r", wp_constituency_name, ynmp_spellings)
 
 def eu_name_from_page(page):
-	m = re.search(r"\|\s*(EP|european)\s*=([^<>\{\}\|]+)", page, flags=re.DOTALL)
+	m = re.search(r"\|\s*(?:EP|european)\s*=([^<>\{\}\|]+)", page, flags=re.DOTALL)
 	if m is None:
 		logging.info("eu_name_from_page failed regexp for %r", page)
 		return UNKNOWN
