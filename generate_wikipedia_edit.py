@@ -79,7 +79,7 @@ def insert_candidate_in_election_box(wikipage, extratext):
 	return head + section + tail
 
 def generate_updated_wikitext(wikipedia_pagename, ynmp_constituency_id, ynmp_candidate_name):
-	wikipage = wikipedia.latest_revision(wikipedia_pagename)
+	wikipage = wikipedia.latest_revision(wikipedia_pagename, allow_redirect=False)
 	ynmp_constituency_data = ynmp.fetch_candidates_in_constituency(ynmp_constituency_id)
 	candidate_data = get_candidate(ynmp_constituency_data, ynmp_candidate_name)
 	candidate_template = wiki_template_for_ynmp_person(candidate_data, ynmp_constituency_data)

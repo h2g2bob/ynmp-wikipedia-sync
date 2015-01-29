@@ -5,10 +5,10 @@ import json
 import re
 from shared import Candidate
 
-def latest_revision(pagename):
+def latest_revision(pagename, allow_redirect=True):
 	logging.debug("latest_revision(%r)", pagename)
 	assert isinstance(pagename, unicode)
-	req = urllib.urlopen("https://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=%s&rvprop=content&format=json" % (urllib.quote(pagename.encode("utf8")),))
+	req = urllib.urlopen("https://en.wikipedia.org/w/api.php?action=query&prop=revisions&titles=%s&rvprop=content&redirects=%s&format=json" % (urllib.quote(pagename.encode("utf8")), "true" if allow_redirect else "false"))
 	page = req.read()
 	try:
 		data = json.loads(page)
