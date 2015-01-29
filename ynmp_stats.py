@@ -154,8 +154,8 @@ def gather_stats():
 	stats = defaultdict(lambda: defaultdict(int))
 	stats_by_eu_region = defaultdict(lambda : defaultdict(lambda: defaultdict(int)))
 
-	with open("constituency_id_to_eu_name.json", "r") as f:
-		constituency_id_to_eu_name = json.load(f)
+	with open("constituency_name_to_eu_name.json", "r") as f:
+		constituency_name_to_eu_name = json.load(f)
 
 	for constituency_id, constituency_name in tuple(ynmp.all_constituencies()):
 		constituency_data = ynmp.fetch_candidates_in_constituency(constituency_id)
@@ -163,7 +163,7 @@ def gather_stats():
 
 		merge_counters(stats, constituency_stats)
 
-		eu_region_name = escape_eu_name(constituency_id_to_eu_name[str(constituency_id)])
+		eu_region_name = escape_eu_name(constituency_name_to_eu_name[constituency_name])
 		merge_counters(stats_by_eu_region[eu_region_name], constituency_stats)
 
 	return stats, stats_by_eu_region
