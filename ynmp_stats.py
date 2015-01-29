@@ -163,7 +163,7 @@ def gather_stats():
 
 		merge_counters(stats, constituency_stats)
 
-		eu_region_name = escape_eu_name(constituency_name_to_eu_name[constituency_name])
+		eu_region_name = escape_eu_name(constituency_name_to_eu_name["%s:%s" % (constituency_id, constituency_name,)])
 		merge_counters(stats_by_eu_region[eu_region_name], constituency_stats)
 
 	return stats, stats_by_eu_region
