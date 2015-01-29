@@ -189,7 +189,7 @@ if __name__=='__main__':
 	logging.root.setLevel({
 		0 : logging.WARN,
 		1 : logging.INFO,
-		}.get(args.verbose, logging.DEBUG))
+		}.get(args.verbose or 0, logging.DEBUG))
 
 	stats, eu_stats = gather_stats()
 
