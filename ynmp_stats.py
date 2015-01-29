@@ -183,7 +183,7 @@ if __name__=='__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--directory", "-d", metavar="DIR", type=str, help="directory for datafiles", required=True)
-	parser.add_argument("--verbose", "-v", action="count", help="More logging (can use multiple times)", required=True)
+	parser.add_argument("--verbose", "-v", action="count", help="More logging (can use multiple times)")
 	args = parser.parse_args()
 
 	logging.root.setLevel({
