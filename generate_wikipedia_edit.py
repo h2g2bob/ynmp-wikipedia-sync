@@ -57,7 +57,8 @@ def get_candidate(ynmp_data, candidate_name):
 	candidate_data_list = {
 		person["person_id"]["id"] : person # de-duplicates repetition of the same person
 		for person in ynmp_data["result"]["memberships"]
-		if person["person_id"]["name"] == candidate_name }
+		if person["person_id"]["name"] == candidate_name
+		and person["person_id"].get("standing_in", {}).get("2015", None) }
 	if len(candidate_data_list) == 1:
 		return candidate_data_list.values()[0]
 	else:
