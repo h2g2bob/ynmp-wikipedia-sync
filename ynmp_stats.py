@@ -174,8 +174,8 @@ def gather_stats(csvfile):
 
 	return stats, stats_by_eu_region
 
-csv_headers = [u'constituency_name', u'eu_region', u'county', u'party',
-	u'gender_male', u'gender_female', 
+csv_headers = [u'constituency_name', u'eu_region', u'county', u'party', u'has_candidate',
+	u'gender_male', u'gender_female', u'gender_other', u'gender_undefined',
 	u'party_2010_only', u'party_2010_and_2015', u'party_2015',
 	u'same_candidate_same_constituency', u'same_candidate_different_constituency',
 	u'has_dob', u'has_email', u'has_ppc', u'has_homepage',
@@ -187,11 +187,13 @@ def write_csv_header(csvfile):
 def write_csv_line(csvfile, constituency_name, eu_region, county, stats):
 	def enc(u):
 		return unicode(u).encode("utf8")
-	parties = set(sum((stat.keys() for stat in stats.values()), []))
+	parties = set(sum(
+		(stats.get(stat_name, {}).keys() for stat_name in csv_headers[5:]),
+		[]))
 	for party in parties:
-		line = [enc(constituency_name), enc(eu_region), enc(county), enc(party)] + [
+		line = [enc(constituency_name), enc(eu_region), enc(county), enc(party), enc(1)] + [
 			enc(stats.get(stat_name, {}).get(party, 0))
-			for stat_name in csv_headers[4:]]
+			for stat_name in csv_headers[5:]]
 		csvfile.writerow(line)
 
 def atomic_write(directory, filename, text):
