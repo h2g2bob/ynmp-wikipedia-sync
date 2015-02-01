@@ -161,7 +161,7 @@ def gather_stats(csvfile):
 	stats = defaultdict(lambda: defaultdict(int))
 	stats_by_eu_region = defaultdict(lambda : defaultdict(lambda: defaultdict(int)))
 
-	for constituency_id, constituency_name in tuple(ynmp.all_constituencies())[:10]:
+	for constituency_id, constituency_name in tuple(ynmp.all_constituencies()):
 		constituency_data = ynmp.fetch_candidates_in_constituency(constituency_id)
 		constituency_stats = parse_constituency_data(constituency_data)
 
