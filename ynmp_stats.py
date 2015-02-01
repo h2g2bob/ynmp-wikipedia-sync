@@ -189,7 +189,7 @@ def write_csv_line(csvfile, constituency_name, eu_region, county, stats):
 		return unicode(u).encode("utf8")
 	parties = set(sum((stat.keys() for stat in stats.values()), []))
 	for party in parties:
-		line = [constituency_name, eu_region, county, party] + [
+		line = [enc(constituency_name), enc(eu_region), enc(county), enc(party)] + [
 			enc(stats.get(stat_name, {}).get(party, 0))
 			for stat_name in csv_headers[4:]]
 		csvfile.writerow(line)
