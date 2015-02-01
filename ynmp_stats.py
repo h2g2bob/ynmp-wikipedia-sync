@@ -6,6 +6,7 @@ import os.path
 import os
 import json
 import tempfile
+import csv
 
 """
 done	party_2010_only[party]
@@ -150,23 +151,46 @@ def parse_constituency_data(data):
 def escape_eu_name(eu_name):
 	return re.sub(r"[^a-z0-9A-Z]", "", eu_name).lower()
 
-def gather_stats():
+def get_region(constituency_id, constituency_name):
+	with open("constituency_name_to_region_name.json", "r") as f:
+		constituency_name_to_region_name = json.load(f)
+	eu_name, county_name = constituency_name_to_region_name["%s:%s" % (constituency_id, constituency_name,)]
+	return escape_eu_name(eu_name), escape_eu_name(county_name)
+
+def gather_stats(csvfile):
 	stats = defaultdict(lambda: defaultdict(int))
 	stats_by_eu_region = defaultdict(lambda : defaultdict(lambda: defaultdict(int)))
 
-	with open("constituency_name_to_eu_name.json", "r") as f:
-		constituency_name_to_eu_name = json.load(f)
-
-	for constituency_id, constituency_name in tuple(ynmp.all_constituencies()):
+	for constituency_id, constituency_name in tuple(ynmp.all_constituencies())[:10]:
 		constituency_data = ynmp.fetch_candidates_in_constituency(constituency_id)
 		constituency_stats = parse_constituency_data(constituency_data)
 
 		merge_counters(stats, constituency_stats)
 
-		eu_region_name = escape_eu_name(constituency_name_to_eu_name["%s:%s" % (constituency_id, constituency_name,)])
+		eu_region_name, county = get_region(constituency_id, constituency_name)
 		merge_counters(stats_by_eu_region[eu_region_name], constituency_stats)
 
+		write_csv_line(csvfile, constituency_name, eu_region_name, county, constituency_stats)
+
 	return stats, stats_by_eu_region
+
+csv_headers = [u'constituency_name', u'eu_region', u'county', u'party',
+	u'gender_male', u'gender_female', 
+	u'party_2010_only', u'party_2010_and_2015', u'party_2015',
+	u'same_candidate_same_constituency', u'same_candidate_different_constituency',
+	u'has_dob', u'has_email', u'has_ppc', u'has_homepage',
+	u'has_twitter', u'has_facebook', u'has_wikipedia']
+
+def write_csv_header(csvfile):
+	csvfile.writerow(csv_headers)
+
+def write_csv_line(csvfile, constituency_name, eu_region, county, stats):
+	parties = set(sum((stat.keys() for stat in stats.values()), []))
+	for party in parties:
+		line = [constituency_name, eu_region, county, party] + [
+			stats.get(stat_name, {}).get(party, 0)
+			for stat_name in csv_headers[4:]]
+		csvfile.writerow(line)
 
 def atomic_write(directory, filename, text):
 	full_dest_filename = os.path.join(directory, filename)
@@ -178,12 +202,14 @@ def atomic_write(directory, filename, text):
 def format_stats(stats):
 	return json.dumps({k : dict(v.items()) for k, v in stats.items()}, indent=True)
 
+
 if __name__=='__main__':
 	import argparse
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--directory", "-d", metavar="DIR", type=str, help="directory for datafiles", required=True)
 	parser.add_argument("--verbose", "-v", action="count", help="More logging (can use multiple times)")
+	parser.add_argument("--csv",  metavar="FILENAME", default="ynmp_stats.csv", help="Output to CSV file")
 	args = parser.parse_args()
 
 	logging.root.setLevel({
@@ -191,7 +217,11 @@ if __name__=='__main__':
 		1 : logging.INFO,
 		}.get(args.verbose or 0, logging.DEBUG))
 
-	stats, eu_stats = gather_stats()
+	with open(args.csv, "w") as csvf:
+		csvfile = csv.writer(csvf)
+		write_csv_header(csvfile)
+
+		stats, eu_stats = gather_stats(csvfile)
 
 	atomic_write(args.directory, "ynmp_stats.json", format_stats(stats))
 	for eu_name, eu_data in eu_stats.items():
