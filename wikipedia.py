@@ -60,7 +60,8 @@ def candidates_from_section(section):
 	candidates_check = re.findall(r"candidate\s*=", section, re.DOTALL | re.I)
 	if len(candidates_check) != len(candidates):
 		raise ValueError((candidates, candidates_check))
-	return [parse_candidate_wikitext(c) for c in candidates]
+	candidates = [parse_candidate_wikitext(c) for c in candidates]
+	return [ c for c in candidates if c.name not in {"", "TBA", "TBC"} ]
 
 def remove_wikilink(name):
 	m = re.search("^\[\[(.*)\]\]$", name.strip())
