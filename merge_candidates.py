@@ -55,6 +55,8 @@ def subst_words(gen):
 		"gareth" : "gary",
 		"daniel" : "dan",
 		"danny" : "dan",
+		"william" : "bill",
+		"will" : "bill",
 	}
 	for word in gen:
 		yield replacements.get(word, word)
