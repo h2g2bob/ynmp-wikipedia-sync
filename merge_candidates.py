@@ -32,7 +32,6 @@ def subst_words(gen):
 		"chinyelu" : "chi",
 		"ernest" : "ernie",
 		"victoria" : "vicky",
-		"andr" : "andree", # u"andr\xe9e"
 		"thomas" : "tom",
 		"charles" : "charlie",
 		"anthony" : "tony",
@@ -58,6 +57,12 @@ def subst_words(gen):
 		"william" : "bill",
 		"will" : "bill",
 		"jaspreet" : "jas",
+		"katharina" : "kat",
+		"stuart" : "stu",
+
+		# Unicode fixes:
+		"andr" : "andree", # u"andr\xe9e"
+		"skwirczy" : "skwirczynski",
 	}
 	for word in gen:
 		yield replacements.get(word, word)
