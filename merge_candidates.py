@@ -59,6 +59,7 @@ def subst_words(gen):
 		"jaspreet" : "jas",
 		"katharina" : "kat",
 		"stuart" : "stu",
+		"raymond" : "ray",
 
 		# Unicode fixes:
 		"andr" : "andree", # u"andr\xe9e"
