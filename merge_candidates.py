@@ -51,6 +51,7 @@ def subst_words(gen):
 		"jacqueline" : "jack",
 		"jacky" : "jack",
 		"james" : "jim",
+		"jimmy" : "jim",
 		"gareth" : "gary",
 		"daniel" : "dan",
 		"danny" : "dan",
