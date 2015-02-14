@@ -61,6 +61,8 @@ def subst_words(gen):
 		"katharina" : "kat",
 		"stuart" : "stu",
 		"raymond" : "ray",
+		"jonathan" : "jon",
+		"jonny" : "jon",
 
 		# Unicode fixes:
 		"andr" : "andree", # u"andr\xe9e"
