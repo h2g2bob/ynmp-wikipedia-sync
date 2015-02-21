@@ -6,7 +6,9 @@ import json
 
 def subst_words(gen):
 	replacements = {
-		"joseph" : "joe",
+		"joseph" : "jo",
+		"joe" : "jo",
+		"josephine" : "jo",
 		"steven" : "steve",
 		"jeffrey" : "jeff",
 		"matthew" : "matt",
@@ -63,6 +65,8 @@ def subst_words(gen):
 		"raymond" : "ray",
 		"jonathan" : "jon",
 		"jonny" : "jon",
+		"gabriella" : "gabby",
+		"debra" : "debbie",
 
 		# Unicode fixes:
 		"andr" : "andree", # u"andr\xe9e"
