@@ -94,7 +94,7 @@ if __name__=='__main__':
 					seen_parties.add(wp_party)
 
 				if ynmp_candidate is None:
-					if wp_candidate is not None and wp_candidate.citation_needed:
+					if wp_candidate is not None and wp_candidate.get("citation_needed", False):
 						outfile.write("<td class=\"missing cn\">missing</td>")
 					else:
 						outfile.write("<td class=\"missing\">missing</td>")
