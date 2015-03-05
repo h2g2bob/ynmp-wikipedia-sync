@@ -93,7 +93,8 @@ def parse_candidate_wikitext(wikitext):
 	party = remove_wikilink(party)
 	party = party.strip()
 	references = list(re.findall(r"\b(https?://[^\"'\s<>\[\]]+)[\"'\s<>\[\]]", wikitext))
-	return Candidate(name, party, person_id=name, party_id=party, references=references)
+	citation_needed = "{{citation needed" in wikitext
+	return Candidate(name, party, person_id=name, party_id=party, references=references, citation_needed=citation_needed)
 
 def fetch_and_parse_candidates(constituency_name):
 	try:
