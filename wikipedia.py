@@ -69,13 +69,14 @@ def remove_wikilink(name):
 		return m.group(1).split("|", 1)[-1]
 	return name
 
+re_citation_needed = re.compile(r"\{\{(?:citation needed|dubious|verification needed|better source).*?\}\}", flags=re.I)
 def remove_references(name):
 	name = re.sub(r"<ref.*?</ref>", "", name)
 	name = re.sub(r"<ref.*?/>", "", name)
 	name = name.strip()
 	if name.startswith("[http"):
 		name = name.split(" ",1)[-1].replace("]", "", 1)
-	name = re.sub(r"\{\{citation needed.*?\}\}", "", name, flags=re.I)
+	name = re_citation_needed.sub("", name)
 	name = re.sub(r"\{\{#tag:.*?\}\}", "", name, flags=re.I)
 	return name
 
@@ -93,7 +94,7 @@ def parse_candidate_wikitext(wikitext):
 	party = remove_wikilink(party)
 	party = party.strip()
 	references = list(re.findall(r"\b(https?://[^\"'\s<>\[\]]+)[\"'\s<>\[\]]", wikitext))
-	citation_needed = "{{citation needed" in wikitext
+	citation_needed = re_citation_needed.search(wikitext) is not None
 	return Candidate(name, party, person_id=name, party_id=party, references=references, citation_needed=citation_needed)
 
 def fetch_and_parse_candidates(constituency_name):
