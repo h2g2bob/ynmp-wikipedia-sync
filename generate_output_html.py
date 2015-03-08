@@ -59,6 +59,15 @@ if __name__=='__main__':
 		wponly=0
 		ynmponly=0
 		outfile.write("<style> th, td { text-align: left; width: 20em; } td.links { width: 8em; } td.links a {color : #99ccff; } .missing { font-weight: bold; background: #cc7777; color: #000000; } .missing.cn { background: #cccc77; } .missing > a { color: #000000; } .constituency { background: #777777; color: #ffffff; } span.party { font-size: 70%; color: #cccccc; } </style>")
+		outfile.write("""<script type="application/javascript">
+function show_boring(showhide) {
+	var l = document.getElementsByClassName("boring");
+	for (var i=0; i < l.length; ++i) {
+		l[i].style.display = showhide ? "" : "none";
+	}
+}
+</script>""")
+		outfile.write("<div><input id=\"show_boring\" type=\"checkbox\" onclick=\"show_boring(this.checked)\" checked /><label for=\"show_boring\">Show all</label></div>")
 		outfile.write("<table>")
 		for constituency_name, wp_candidates, ynmp_candidates in sorted(combined_data.merge_constituencies(constituency_map, "wikipedia", wikipedia, "ynmp", ynmp)):
 			seen_parties = set()
@@ -72,12 +81,14 @@ if __name__=='__main__':
 				# logging.debug("%r %r: %r -- %r", constituency_name, candidate_name, wp_candidate, ynmp_candidate)
 				warnings = []
 
-				outfile.write("<tr>")
 				if wp_candidate is None:
+					outfile.write("<tr>")
 					ynmponly += 1
 				elif ynmp_candidate is None:
+					outfile.write("<tr>")
 					wponly += 1
 				else:
+					outfile.write("<tr class=\"boring\">")
 					both += 1
 
 				ynmp_party = party_names.to_short_name(ynmp_candidate["party"]) if ynmp_candidate is not None else None
