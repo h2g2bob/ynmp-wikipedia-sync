@@ -70,6 +70,7 @@ def subst_words(gen):
 		"debra" : "debbie",
 		"gerrard" : "gerry",
 		"samuel" : "sam",
+		"richard" : "rick",
 
 		# Unicode fixes:
 		"andr" : "andree", # u"andr\xe9e"
