@@ -72,6 +72,7 @@ def subst_words(gen):
 		"samuel" : "sam",
 		"richard" : "rick",
 		"rich" : "rick",
+		"dominic" : "dom",
 
 		# Unicode fixes:
 		"andr" : "andree", # u"andr\xe9e"
