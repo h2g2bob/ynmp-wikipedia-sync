@@ -69,7 +69,7 @@ def remove_wikilink(name):
 		return m.group(1).split("|", 1)[-1]
 	return name
 
-re_citation_needed = re.compile(r"\{\{(?:citation needed|dubious|verification needed|better source).*?\}\}", flags=re.I)
+re_citation_needed = re.compile(r"\{\{(?:citation needed|dubious|verification needed|better source|dead link).*?\}\}", flags=re.I)
 def remove_references(name):
 	name = re.sub(r"<ref.*?</ref>", "", name)
 	name = re.sub(r"<ref.*?/>", "", name)
