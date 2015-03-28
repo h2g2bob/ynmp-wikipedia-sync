@@ -13,6 +13,8 @@ def subst_words(gen):
 		"jeffrey" : "jeff",
 		"matthew" : "matt",
 		"christopher" : "chris",
+		"kristopher" : "chris",
+		"kris" : "chris",
 		"vincent" : "vince",
 		"michael" : "mike",
 		"mick" : "mike",
@@ -73,6 +75,8 @@ def subst_words(gen):
 		"richard" : "rick",
 		"rich" : "rick",
 		"dominic" : "dom",
+		"geoffrey" : "geoff",
+		"jennifer" : "jenny",
 
 		# Unicode fixes:
 		"andr" : "andree", # u"andr\xe9e"
