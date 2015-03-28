@@ -56,6 +56,7 @@ def extract_post_id(person, year):
 	return s_year["post_id"]
 
 def parse_constituency_data(data):
+	changed_party = []
 	stats = defaultdict(lambda: defaultdict(int))
 	post_id = data["result"]["id"]
 	parties_2015 = set()
@@ -87,6 +88,7 @@ def parse_constituency_data(data):
 					stats["candidate_changed_party"]["%s to %s" % (party_2010, party_2015,)] += 1
 					stats["candidate_changed_party_from"][party_2010] += 1
 					stats["candidate_changed_party_to"][party_2015] += 1
+					changed_party.append((person["id"], person["name"], party_2010, party_2015))
 
 			if standing_here_2015:
 				parties_2015.add(party_2015)
@@ -146,7 +148,7 @@ def parse_constituency_data(data):
 	for party in parties_2015:
 		stats["party_2015"][party] += 1
 		
-	return stats
+	return stats, changed_party
 
 def escape_eu_name(eu_name):
 	return re.sub(r"[^a-z0-9A-Z]", "", eu_name).lower()
@@ -157,20 +159,22 @@ def get_region(constituency_id, constituency_name):
 	eu_name, county_name = constituency_name_to_region_name["%s:%s" % (constituency_id, constituency_name,)]
 	return escape_eu_name(eu_name), escape_eu_name(county_name)
 
-def gather_stats(csvfile):
+def gather_stats(stats_csv, changed_party_csv):
 	stats = defaultdict(lambda: defaultdict(int))
 	stats_by_eu_region = defaultdict(lambda : defaultdict(lambda: defaultdict(int)))
 
 	for constituency_id, constituency_name in tuple(ynmp.all_constituencies()):
 		constituency_data = ynmp.fetch_candidates_in_constituency(constituency_id)
-		constituency_stats = parse_constituency_data(constituency_data)
+		constituency_stats, changed_party = parse_constituency_data(constituency_data)
 
 		merge_counters(stats, constituency_stats)
 
 		eu_region_name, county = get_region(constituency_id, constituency_name)
 		merge_counters(stats_by_eu_region[eu_region_name], constituency_stats)
 
-		write_csv_line(csvfile, constituency_name, eu_region_name, county, constituency_stats)
+		write_csv_line(stats_csv, constituency_name, eu_region_name, county, constituency_stats)
+
+		changed_party_csv.writerows(changed_party)
 
 	return stats, stats_by_eu_region
 
@@ -214,6 +218,7 @@ if __name__=='__main__':
 	parser.add_argument("--directory", "-d", metavar="DIR", type=str, help="directory for datafiles", required=True)
 	parser.add_argument("--verbose", "-v", action="count", help="More logging (can use multiple times)")
 	parser.add_argument("--csv",  metavar="FILENAME", default="ynmp_stats.csv", help="Output to CSV file")
+	parser.add_argument("--chgparty",  metavar="FILENAME", default="chgparty.txt", help="Output to CSV file")
 	args = parser.parse_args()
 
 	logging.root.setLevel({
@@ -222,10 +227,12 @@ if __name__=='__main__':
 		}.get(args.verbose or 0, logging.DEBUG))
 
 	with open(args.csv, "w") as csvf:
-		csvfile = csv.writer(csvf)
-		write_csv_header(csvfile)
+		with open(args.chgparty, "w") as chgparty:
+			csvfile = csv.writer(csvf)
+			write_csv_header(csvfile)
+			chgparty = csv.writer(chgparty)
 
-		stats, eu_stats = gather_stats(csvfile)
+			stats, eu_stats = gather_stats(csvfile, chgparty)
 
 	atomic_write(args.directory, "ynmp_stats.json", format_stats(stats))
 	for eu_name, eu_data in eu_stats.items():
