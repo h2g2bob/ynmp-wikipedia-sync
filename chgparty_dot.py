@@ -23,8 +23,10 @@ parties = dict((x.ynmp, x) for x in (
 
 	Pty("British National Party", "BNP"),
 	Pty("Christian Party \"Proclaiming Christ's Lordship\"", "Christian"),
-	Pty("English Democrats", "Eng Democrats"),
+	Pty("English Democrats", "Eng Dem"),
 	Pty("Ulster Unionist Party", "UUP"),
+	Pty("Trade Unionist and Socialist Coalition", "TUSC"),
+	Pty("National Health Action Party", "NHA"),
 ))
 
 party_others = Pty("Others", "Others")
@@ -79,6 +81,8 @@ def main(args):
 		new = get_party(new_name, args)
 		by_parties[old, new].append(name)
 
+	if args.trim_parties:
+		by_parties = trim_parties(args, by_parties)
 	if not args.no_others:
 		by_parties = dict(((old, new), namelist) for ((old, new), namelist) in by_parties.items() if old != "Others" and new != "Others")
 	if not args.others_to_others:
@@ -87,6 +91,24 @@ def main(args):
 		by_parties = dict(((old, new), namelist) for ((old, new), namelist) in by_parties.items() if len(namelist) > args.trim or max((old.rank, new.rank)) < args.dont_trim_large)
 
 	print_digraph(by_parties, name_grouping_individual if args.single_line else name_grouping_grouped, args)
+
+def trim_parties(args, by_parties):
+	counts = defaultdict(int)
+	for (old, new), namelist in by_parties.items():
+		counts[old] += len(namelist)
+		counts[new] += len(namelist)
+
+	to_trim = set(k for (k, v) in counts.items() if v <= args.trim_parties)
+	
+	rtn = {}
+	for (old, new), namelist in by_parties.items():
+		if old in to_trim:
+			old = party_others
+		if new in to_trim:
+			new = party_others
+		rtn.setdefault((old, new), []).extend(namelist)
+
+	return rtn
 
 if __name__=='__main__':
 	import argparse
@@ -97,6 +119,8 @@ if __name__=='__main__':
 	parser.add_argument("-t", "--trim", action="count", default=0, help="Hide single defections (multiple times to hide less than N defections)")
 	parser.add_argument("-T", "--dont-trim-large", action="count", default=0, help="Do not hide single defections to/from large political parties")
 	parser.add_argument("-s", "--hide-small", action="count", default=0, help="Hide small parties (multiple times to hide more parties)")
+	parser.add_argument("-x", "--trim-parties", action="count", default=0, help="Trim parties with few defections")
+
 	parser.add_argument("-o", "--no-others", action="store_false", default=True, help="Hide the combined \"others\" for small parties")
 	parser.add_argument("-2", "--others-to-others", action="store_true", default=False, help="Show defections from \"others\" to itself")
 	parser.add_argument("-i", "--independent", action="store_true", default=False, help="Show independent and others as different")
