@@ -25,6 +25,8 @@ def subst_words(gen):
 		"oliver" : "ollie",
 		"peter" : "pete",
 		"philip" : "phil",
+		'phillip' : 'phil',
+		'phill' : 'phil',
 		"cammy" : "cameron",
 		"david" : "dave",
 		"stephen" : "steve",
