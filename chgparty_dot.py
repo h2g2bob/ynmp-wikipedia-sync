@@ -74,7 +74,7 @@ def print_digraph(by_parties, name_grouping, args):
 
 def main(args):
 	by_parties = defaultdict(list)
-	for _, name, old_name, new_name in csv.reader(open("chgparty.txt")):
+	for _, name, old_name, new_name in csv.reader(open("chgparty.csv")):
 		old = get_party(old_name, args)
 		new = get_party(new_name, args)
 		by_parties[old, new].append(name)

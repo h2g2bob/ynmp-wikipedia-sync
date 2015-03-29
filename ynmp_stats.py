@@ -218,7 +218,7 @@ if __name__=='__main__':
 	parser.add_argument("--directory", "-d", metavar="DIR", type=str, help="directory for datafiles", required=True)
 	parser.add_argument("--verbose", "-v", action="count", help="More logging (can use multiple times)")
 	parser.add_argument("--csv",  metavar="FILENAME", default="ynmp_stats.csv", help="Output to CSV file")
-	parser.add_argument("--chgparty",  metavar="FILENAME", default="chgparty.txt", help="Output to CSV file")
+	parser.add_argument("--chgparty",  metavar="FILENAME", default="chgparty.csv", help="Output to CSV file")
 	args = parser.parse_args()
 
 	logging.root.setLevel({
