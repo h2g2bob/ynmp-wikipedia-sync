@@ -79,7 +79,7 @@ def main(args):
 		by_parties[old, new].append(name)
 
 	if args.ignore_uup:
-		by_parties.pop(("Conservative and Unionist Party", "Ulster Unionist Party"))
+		by_parties.pop(("Conservative and Unionist Party", "Ulster Unionist Party"), None) # pop with default avoids KeyError
 	if args.trim_parties:
 		by_parties = trim_parties(args, by_parties)
 	if not args.no_others:
