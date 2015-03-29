@@ -32,9 +32,6 @@ parties = dict((x.ynmp, x) for x in (
 party_others = Pty("Others", "Others")
 
 def get_party(ynmp_name, args):
-	if ynmp_name == "Conservative and Unionist Party":
-		ynmp_name = "Conservative Party"
-
 	try:
 		party = parties[ynmp_name]
 	except KeyError:
@@ -81,6 +78,8 @@ def main(args):
 		new = get_party(new_name, args)
 		by_parties[old, new].append(name)
 
+	if args.ignore_uup:
+		by_parties.pop(("Conservative and Unionist Party", "Ulster Unionist Party"))
 	if args.trim_parties:
 		by_parties = trim_parties(args, by_parties)
 	if not args.no_others:
@@ -127,6 +126,9 @@ if __name__=='__main__':
 	parser.add_argument("-1", "--single-line", action="store_true", default=False, help="Show one line per candidate")
 	parser.add_argument("-c", "--no-color", action="store_false", dest="color", default=True, help="No color")
 	parser.add_argument("-n", "--no-names", action="store_false", dest="names", default=True, help="No names")
+
+	parser.add_argument("--no-ignore-uup", action="store_false", dest="ignore_uup", default=True, help="The UUP fielded a bunch of candidates jointly with the Conservative Party, using the name \"Conservative and Unionist Party\". The candidates were really UUP people, so this transition is boring.")
+
 	args = parser.parse_args()
 
 	if args.dont_trim_large and not args.trim:
