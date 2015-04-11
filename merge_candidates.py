@@ -38,6 +38,7 @@ def subst_words(gen):
 		"chinyelu" : "chi",
 		"ernest" : "ernie",
 		"victoria" : "vicky",
+		"vicki" : "vicky",
 		"thomas" : "tom",
 		"charles" : "charlie",
 		"anthony" : "tony",
@@ -79,6 +80,8 @@ def subst_words(gen):
 		"dominic" : "dom",
 		"geoffrey" : "geoff",
 		"jennifer" : "jenny",
+		"jessica" : "jess",
+		"catherine" : "cathy",
 
 		# Unicode fixes:
 		"andr" : "andree", # u"andr\xe9e"
