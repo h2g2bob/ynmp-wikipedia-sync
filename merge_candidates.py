@@ -35,6 +35,7 @@ def subst_words(gen):
 		"clifford" : "cliff",
 		"edward" : "ed",
 		"eddy" : "ed",
+		"ted" : "ed",
 		"nicholas" : "nick",
 		"nic" : "nick",
 		"chinyelu" : "chi",
