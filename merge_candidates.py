@@ -88,6 +88,7 @@ def subst_words(gen):
 		"catherine" : "cathy",
 		"theodora" : "theo",
 		"annie" : "ann",
+		"geraldine" : "gerri",
 
 		# Unicode fixes:
 		"andr" : "andree", # u"andr\xe9e"
