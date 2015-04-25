@@ -32,9 +32,6 @@ parties = dict((x.ynmp, x) for x in (
 party_others = Pty("Others", "Others")
 
 def get_party(ynmp_name, args):
-	if ynmp_name == "Labour and Co-operative Party":
-		ynmp_name = "Labour Party"
-
 	try:
 		party = parties[ynmp_name]
 	except KeyError:

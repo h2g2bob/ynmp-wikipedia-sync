@@ -44,7 +44,12 @@ def extract_party_name(person, year):
 	m_year = memberships.get(year)
 	if m_year is None:
 		return None
-	return m_year["name"]
+	name = m_year["name"]
+	if name == "Christian Party \"Proclaiming Christ's Lordship\" ": # welsh christian party id=392
+		name = "Christian Party \"Proclaiming Christ's Lordship\"" # normal id=1992
+	if name == "Labour and Co-operative Party":
+		name = "Labour Party"
+	return name
 
 def extract_post_id(person, year):
 	standings = person["standing_in"]
